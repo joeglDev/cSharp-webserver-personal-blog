@@ -7,12 +7,28 @@ When running in dotNET press `CTRL + F5` and navigate to `https://localhost:7234
 
 ## Documentation
 
+- Returns the developer who created this app's details.
 ```
 GET /author 
 Returns: 
 {
     Name: Joe Gilbert
     Github: joegldev
+}
+
+```
+
+- Returns every blog post on the system (does not filter by user)
+/* TODO:add images */
+```
+GET /blogs
+Returns:
+{   
+    Id: Number
+    Author: String
+    Title: String
+    Content: String
+    Likes: Number
 }
 
 ```
