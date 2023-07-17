@@ -20,26 +20,27 @@ namespace cSharp_webserver_personal_blog.Controllers
             _context = context;
         }
 
+
         // GET: api/BlogPost
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<BlogPostItem>>> GetTodoItems()
+        public async Task<ActionResult<IEnumerable<BlogPostItem>>> GetBlogPostItems()
         {
-          if (_context.TodoItems == null)
+          if (_context.BlogPostItems == null)
           {
               return NotFound();
           }
-            return await _context.TodoItems.ToListAsync();
+            return await _context.BlogPostItems.ToListAsync();
         }
 
         // GET: api/BlogPost/5
         [HttpGet("{id}")]
         public async Task<ActionResult<BlogPostItem>> GetBlogPostItem(int id)
         {
-          if (_context.TodoItems == null)
+          if (_context.BlogPostItems == null)
           {
               return NotFound();
           }
-            var blogPostItem = await _context.TodoItems.FindAsync(id);
+            var blogPostItem = await _context.BlogPostItems.FindAsync(id);
 
             if (blogPostItem == null)
             {
@@ -85,11 +86,11 @@ namespace cSharp_webserver_personal_blog.Controllers
         [HttpPost]
         public async Task<ActionResult<BlogPostItem>> PostBlogPostItem(BlogPostItem blogPostItem)
         {
-          if (_context.TodoItems == null)
+          if (_context.BlogPostItems == null)
           {
               return Problem("Entity set 'BlogPostContext.TodoItems'  is null.");
           }
-            _context.TodoItems.Add(blogPostItem);
+            _context.BlogPostItems.Add(blogPostItem);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetBlogPostItem), new { id = blogPostItem.Id }, blogPostItem);
@@ -99,17 +100,17 @@ namespace cSharp_webserver_personal_blog.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBlogPostItem(int id)
         {
-            if (_context.TodoItems == null)
+            if (_context.BlogPostItems == null)
             {
                 return NotFound();
             }
-            var blogPostItem = await _context.TodoItems.FindAsync(id);
+            var blogPostItem = await _context.BlogPostItems.FindAsync(id);
             if (blogPostItem == null)
             {
                 return NotFound();
             }
 
-            _context.TodoItems.Remove(blogPostItem);
+            _context.BlogPostItems.Remove(blogPostItem);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -117,7 +118,7 @@ namespace cSharp_webserver_personal_blog.Controllers
 
         private bool BlogPostItemExists(int id)
         {
-            return (_context.TodoItems?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.BlogPostItems?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
