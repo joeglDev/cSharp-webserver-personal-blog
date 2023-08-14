@@ -3,12 +3,12 @@ namespace Blog.Models;
 public class BlogPostItem
 {
     public int Id { get; set; }
-    public string Author { get; set; }
-    public string Title { get; set; }
-    public string Content { get; set; }
+    public string Author { get; set; } = "unassigned author";
+    public string Title { get; set; } = "unassigned title";
+    public string Content { get; set; } = "unassigned content";
     public int Likes { get; set; }
 
-    public string TimeStamp {get; set;}
+    public DateTime TimeStamp {get; set;}
 
       // Parameterless constructor for Entity Framework
     public BlogPostItem()
