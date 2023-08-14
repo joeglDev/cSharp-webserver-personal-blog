@@ -8,6 +8,13 @@ public class BlogPostItem
     public string Content { get; set; }
     public int Likes { get; set; }
 
+    public string TimeStamp {get; set;}
+
+      // Parameterless constructor for Entity Framework
+    public BlogPostItem()
+    {
+    }
+
     // Constructor
     public BlogPostItem(int id, string author, string title, string content, int likes)
     {
@@ -17,4 +24,5 @@ public class BlogPostItem
         Content = content;
         Likes = likes;
     }
+
 }
