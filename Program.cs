@@ -12,7 +12,9 @@ builder.Services.AddCors(options =>
                       policy  =>
                       {
                           policy.WithOrigins("http://localhost:3000");
-                      });
+                          policy.WithHeaders("authorization", "accept", "content-type", "origin");
+                      }
+                     );
 });
 
 // Add services to the container.
