@@ -1,3 +1,5 @@
+using Webserver.Controllers;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -8,5 +10,7 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
 app.MapGet("/ping", () => "pong");
+
+app.MapGet("/author", () => GetAuthorItemService.GetAuthorItem("Joe Gilbert", "joeglDev"));
 
 app.Run();
