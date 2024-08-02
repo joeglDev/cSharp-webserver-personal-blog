@@ -13,4 +13,6 @@ app.MapGet("/ping", () => "pong");
 
 app.MapGet("/author", () => GetAuthorItemService.GetAuthorItem("Joe Gilbert", "joeglDev"));
 
+app.MapGet("/posts", () => BlogPostService.GetAllPosts());
+
 app.Run();
