@@ -57,7 +57,7 @@ WHERE NOT EXISTS (
 
         cmd.Parameters.AddWithValue(":author", "The Dev");
         cmd.Parameters.AddWithValue(":title", "Cats: So many!");
-        cmd.Parameters.AddWithValue(":content", "There are so many cats where I live. Loads of them!");
+        cmd.Parameters.AddWithValue(":content", "This is an example blog post to tell you that my cat Bennet is one cool cat. A tuxedo cat to be specific! ^w^");
         cmd.Parameters.AddWithValue(":timestamp", now);
         cmd.Parameters.AddWithValue(":likes", 3);
  
