@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Webserver.Models;
 
 public class BlogPostService {
-    public static List<BlogPost> GetAllPosts() {
+    public static async Task<List<BlogPost> > GetAllPosts() {
         List<BlogPost> AllBlogPosts = [];
 
         // note

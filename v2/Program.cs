@@ -1,4 +1,5 @@
 using Webserver.Controllers;
+using Db;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
@@ -8,6 +9,10 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseHttpsRedirection();
+
+// Seed database
+var seeder = new DatabaseSeeder();
+await seeder.SeedDbAsync();
 
 app.MapGet("/ping", () => "pong");
 
