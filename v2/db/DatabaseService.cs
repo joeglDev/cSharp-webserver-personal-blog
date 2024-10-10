@@ -7,20 +7,23 @@ using Webserver.Models;
 
 public class DatabaseService() : DatabaseAbstract
 {
-   public async Task<List<BlogPost>> GetAllBlogPosts() {
+    public async Task<List<BlogPost>> GetAllBlogPosts()
+    {
         List<BlogPost> posts = [];
 
         GetConnection();
 
-        if (_connection is null) {
+        if (_connection is null)
+        {
             throw new Exception("Connection is null");
         }
 
-    try {
+        try
+        {
 
-        await _connection.OpenAsync();
+            await _connection.OpenAsync();
 
-            using var cmd = new NpgsqlBatch(_connection) 
+            using var cmd = new NpgsqlBatch(_connection)
             {
                 BatchCommands = {
                     new NpgsqlBatchCommand("SELECT * FROM blogposts;")
@@ -29,7 +32,7 @@ public class DatabaseService() : DatabaseAbstract
 
             using var reader = await cmd.ExecuteReaderAsync();
 
-            while (await reader.ReadAsync()) 
+            while (await reader.ReadAsync())
             {
                 posts.Add(new BlogPost(
         reader.GetInt32(ordinal: 0), // Id
@@ -44,12 +47,16 @@ public class DatabaseService() : DatabaseAbstract
             await reader.CloseAsync();
             return posts;
 
-    } catch (Exception Ex) {
-        Console.WriteLine($"An error occured reading all blog posts: {Ex}");
-        return [];
-    } finally {
-        await _connection.DisposeAsync();
+        }
+        catch (Exception Ex)
+        {
+            Console.WriteLine($"An error occured reading all blog posts: {Ex}");
+            return [];
+        }
+        finally
+        {
+            await _connection.DisposeAsync();
+        }
     }
-   }
- 
+
 }

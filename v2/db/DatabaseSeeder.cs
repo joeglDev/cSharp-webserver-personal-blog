@@ -4,33 +4,41 @@ namespace Db;
 
 public class DatabaseSeeder() : DatabaseAbstract
 {
-    public async Task SeedDbAsync() {
+    public async Task SeedDbAsync()
+    {
         Console.WriteLine("Seeding database...");
 
         GetConnection();
 
-        if (_connection is null) {
+        if (_connection is null)
+        {
             throw new Exception("Connection is null");
         }
 
-        try {
+        try
+        {
             await _connection.OpenAsync();
 
             await CreateBlogPostTableAsync();
             await InsertDataIfBlogpostTableEmpty();
-            
+
             Console.WriteLine("Seeded database successfully");
-        } catch (Exception Ex) {
+        }
+        catch (Exception Ex)
+        {
             Console.WriteLine($"An error occured while seeding the database: {Ex}");
             throw;
-        } finally {
+        }
+        finally
+        {
             await _connection.DisposeAsync();
         }
     }
 
-    private async Task CreateBlogPostTableAsync() {
-         using var cmd = new NpgsqlCommand(
-        @"CREATE TABLE IF NOT EXISTS blogposts (
+    private async Task CreateBlogPostTableAsync()
+    {
+        using var cmd = new NpgsqlCommand(
+       @"CREATE TABLE IF NOT EXISTS blogposts (
             Id SERIAL PRIMARY KEY,
             Author VARCHAR(255) DEFAULT 'unassigned author',
             Title VARCHAR(255) DEFAULT 'unassigned title',
@@ -38,20 +46,21 @@ public class DatabaseSeeder() : DatabaseAbstract
             TimeStamp TIMESTAMP WITHOUT TIME ZONE,
             Likes INTEGER DEFAULT 0
         )",
-        _connection);
+       _connection);
 
-    await cmd.ExecuteNonQueryAsync();
+        await cmd.ExecuteNonQueryAsync();
     }
 
-    private async Task InsertDataIfBlogpostTableEmpty() {
+    private async Task InsertDataIfBlogpostTableEmpty()
+    {
         string insertQuery = @"INSERT INTO blogposts (Author, Title, Content, TimeStamp, Likes)
 SELECT :author, :title, :content, :timestamp, :likes
 WHERE NOT EXISTS (
     SELECT 1 FROM blogposts WHERE Author = :author AND Title = :title
 );";
-    
+
         using var cmd = new NpgsqlCommand(insertQuery, _connection);
-        
+
         // Set parameter values
         DateTime now = DateTime.Now;
 
@@ -60,7 +69,7 @@ WHERE NOT EXISTS (
         cmd.Parameters.AddWithValue(":content", "This is an example blog post to tell you that my cat Bennet is one cool cat. A tuxedo cat to be specific! ^w^");
         cmd.Parameters.AddWithValue(":timestamp", now);
         cmd.Parameters.AddWithValue(":likes", 3);
- 
+
         await cmd.ExecuteNonQueryAsync();
     }
 }
