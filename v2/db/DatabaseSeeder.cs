@@ -2,10 +2,8 @@ using Npgsql;
 
 namespace Db;
 
-public class DatabaseSeeder()
+public class DatabaseSeeder() : DatabaseAbstract
 {
-    private NpgsqlConnection? _connection;
-
     public async Task SeedDbAsync() {
         Console.WriteLine("Seeding database...");
 
@@ -42,16 +40,6 @@ public class DatabaseSeeder()
         _connection);
 
     await cmd.ExecuteNonQueryAsync();
-    }
-
-    public void GetConnection()
-     {  
-        Console.WriteLine("Setting the connection string");
-        //todo move this to env file
-        string connectionString = "Host=localhost;Database=hiroji;Username=hiroji;Password=password;";
-        
-        var connection = new NpgsqlConnection(connectionString);
-        _connection = connection;
     }
 }
 
