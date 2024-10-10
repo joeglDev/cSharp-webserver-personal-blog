@@ -1,4 +1,5 @@
 using Webserver.Controllers;
+using Db;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
@@ -9,8 +10,14 @@ app.UseSwagger();
 app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
+// Seed database
+var seeder = new DatabaseSeeder();
+await seeder.SeedDbAsync();
+
 app.MapGet("/ping", () => "pong");
 
 app.MapGet("/author", () => GetAuthorItemService.GetAuthorItem("Joe Gilbert", "joeglDev"));
+
+app.MapGet("/posts", () => BlogPostService.GetAllPosts());
 
 app.Run();
