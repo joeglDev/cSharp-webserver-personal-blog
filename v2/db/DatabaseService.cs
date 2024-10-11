@@ -1,9 +1,7 @@
 using Npgsql;
-using Webserver.Controllers;
+using Webserver.Models;
 
 namespace Db;
-
-using Webserver.Models;
 
 public class DatabaseService() : DatabaseAbstract
 {
@@ -59,4 +57,63 @@ public class DatabaseService() : DatabaseAbstract
         }
     }
 
+    public async Task<bool> InsertBlogPost(BlogPost NewPost)
+    {
+
+        GetConnection();
+
+        if (_connection is null)
+        {
+            throw new Exception("Connection is null");
+        }
+
+        try
+        {
+
+            await _connection.OpenAsync();
+
+            string sql = @"
+            INSERT INTO BlogPosts (
+                Author,
+                Title,
+                Content,
+                TimeStamp,
+                Likes
+            )
+            VALUES (
+                :Author,
+                :Title,
+                :Content,
+                :TimeStamp,
+                :Likes
+            )
+            RETURNING Id";
+
+            using var cmd = new NpgsqlCommand(sql, _connection);
+
+            cmd.Parameters.AddWithValue(":Author", NewPost.Author);
+            cmd.Parameters.AddWithValue(":Title", NewPost.Title);
+            cmd.Parameters.AddWithValue(":Content", NewPost.Content);
+            cmd.Parameters.AddWithValue(":TimeStamp", NewPost.TimeStamp);
+            cmd.Parameters.AddWithValue(":Likes", NewPost.Likes);
+
+            object? result = cmd.ExecuteScalar();
+            result = (result == DBNull.Value) ? null : result;
+            int id = Convert.ToInt32(result);
+
+            return id > 0;
+
+        }
+        catch (Exception Ex)
+        {
+            // todo: add 400 vs 500 error handling here
+            Console.WriteLine($"An error occured creating a blog post: {Ex}");
+            await _connection.DisposeAsync();
+            return false;
+        }
+        finally
+        {
+            await _connection.DisposeAsync();
+        }
+    }
 }
