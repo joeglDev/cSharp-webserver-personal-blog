@@ -116,4 +116,100 @@ public class DatabaseService() : DatabaseAbstract
             await _connection.DisposeAsync();
         }
     }
+
+    public async Task<bool> DeleteBlogPost(int Id)
+    {
+
+        GetConnection();
+
+        if (_connection is null)
+        {
+            throw new Exception("Connection is null");
+        }
+
+        try
+        {
+
+            await _connection.OpenAsync();
+
+            string sql = @"DELETE FROM blogposts WHERE Id = :Id";
+
+            using var cmd = new NpgsqlCommand(sql, _connection);
+
+            cmd.Parameters.AddWithValue(":Id", Id);
+
+            int affectedRows = await cmd.ExecuteNonQueryAsync();
+            return affectedRows > 0;
+
+        }
+        catch (Exception Ex)
+        {
+            // todo: add 400 vs 500 error handling here
+            Console.WriteLine($"An error occured deleting a blog post: {Ex}");
+            await _connection.DisposeAsync();
+            return false;
+        }
+        finally
+        {
+            await _connection.DisposeAsync();
+        }
+    }
+
+    public async Task<BlogPost?> PatchBlogPost(int Id, BlogPost UpdatedPost)
+    {
+
+        GetConnection();
+
+        if (_connection is null)
+        {
+            throw new Exception("Connection is null");
+        }
+
+        try
+        {
+
+            await _connection.OpenAsync();
+
+            string sql = @"UPDATE BlogPosts SET Author=:Author, Title=:Title, Content=:Content, TimeStamp=TimeStamp, Likes=:Likes WHERE Id = :Id RETURNING *;";
+
+            using var cmd = new NpgsqlCommand(sql, _connection);
+
+            cmd.Parameters.AddWithValue(":Author", UpdatedPost.Author);
+            cmd.Parameters.AddWithValue(":Title", UpdatedPost.Title);
+            cmd.Parameters.AddWithValue(":Content", UpdatedPost.Content);
+            cmd.Parameters.AddWithValue(":TimeStamp", UpdatedPost.TimeStamp);
+            cmd.Parameters.AddWithValue(":Likes", UpdatedPost.Likes);
+            cmd.Parameters.AddWithValue(":Id", Id);
+
+            using var reader = await cmd.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                var updatedPost = new BlogPost(
+                    reader.GetInt32(ordinal: 0), // Id
+                    reader.GetString(ordinal: 1), // Author
+                    reader.GetString(ordinal: 2), // Title
+                    reader.GetString(ordinal: 3), // Content
+                    reader.GetDateTime(ordinal: 4), // TimeStamp
+                    reader.GetInt32(ordinal: 5)   // Likes
+                );
+            }
+
+            await reader.CloseAsync();
+
+            return UpdatedPost;
+        }
+        catch (Exception Ex)
+        {
+            // todo: add 400 vs 500 error handling here
+            Console.WriteLine($"An error occured patching a blog post: {Ex}");
+            await _connection.DisposeAsync();
+            return null;
+        }
+        finally
+        {
+            await _connection.DisposeAsync();
+        }
+    }
+
 }
