@@ -3,3 +3,5 @@ obj
 Properties
 appsettings.*
 bin
+
+.env

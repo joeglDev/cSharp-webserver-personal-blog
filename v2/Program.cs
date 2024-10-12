@@ -1,7 +1,6 @@
 using Webserver.Controllers;
 using Db;
 using Webserver.Models;
-using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
