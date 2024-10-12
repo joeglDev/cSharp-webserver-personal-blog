@@ -19,7 +19,7 @@ public class BlogPostService
     }
 
     //todo: should return HTTP 204
-    public static async Task<object> PostBlogPost(BlogPost NewPost)
+    public static async Task<IResult> PostBlogPost(BlogPost NewPost)
     {
         bool InsertSucceeded = await _service.InsertBlogPost(NewPost);
         if (InsertSucceeded)
@@ -28,6 +28,16 @@ public class BlogPostService
         }
         else
         {
+            return Results.BadRequest();
+        }
+    }
+
+    public static async Task<IResult> DeleteBlogPost(int id) {
+        bool DeleteSucceeded = await _service.DeleteBlogPost(id);
+
+        if (DeleteSucceeded) {
+            return Results.NoContent();
+        } else {
             return Results.BadRequest();
         }
     }

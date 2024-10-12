@@ -24,4 +24,6 @@ app.MapGet("/posts", () => BlogPostService.GetAllPosts());
 
 app.MapPost("/post", (BlogPost NewPost) => BlogPostService.PostBlogPost(NewPost));
 
+app.MapDelete("/post/{id}", (int id) => BlogPostService.DeleteBlogPost(id));
+
 app.Run();
