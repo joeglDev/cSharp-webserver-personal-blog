@@ -32,12 +32,31 @@ public class BlogPostService
         }
     }
 
-    public static async Task<IResult> DeleteBlogPost(int id) {
+    //todo: should return HTTP 201
+    public static async Task<IResult> DeleteBlogPost(int id)
+    {
         bool DeleteSucceeded = await _service.DeleteBlogPost(id);
 
-        if (DeleteSucceeded) {
+        if (DeleteSucceeded)
+        {
             return Results.NoContent();
-        } else {
+        }
+        else
+        {
+            return Results.BadRequest();
+        }
+    }
+
+    public static async Task<IResult> PatchBlogPost(int id, BlogPost UpdatedBlogPost)
+    {
+        BlogPost? PatchResponse = await _service.PatchBlogPost(id, UpdatedBlogPost);
+
+        if (PatchResponse is not null)
+        {
+            return Results.Ok(PatchResponse);
+        }
+        else
+        {
             return Results.BadRequest();
         }
     }
