@@ -1,7 +1,6 @@
 using Webserver.Controllers;
 using Db;
 using Webserver.Models;
-using Swashbuckle.AspNetCore.SwaggerUI;
 
 var builder = WebApplication.CreateBuilder(args);
 
