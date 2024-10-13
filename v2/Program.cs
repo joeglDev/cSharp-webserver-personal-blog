@@ -17,7 +17,7 @@ builder.Services.AddCors(options =>
             .WithMethods("GET", "POST", "PATCH", "DELETE")
             .AllowAnyHeader()
             .AllowCredentials());
-});    
+});
 
 var app = builder.Build();
 
@@ -44,5 +44,7 @@ app.MapPatch("/api/post/{id}", (int id, BlogPost UpdatedBlogPost) => BlogPostSer
 
 // images
 app.MapGet("/api/images", () => ImageService.GetAllImages()).WithTags("Images");
+
+app.MapGet("/api/image/{id}", (int id) => ImageService.GetImage(id)).WithTags("Images");
 
 app.Run();

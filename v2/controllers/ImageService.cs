@@ -16,4 +16,17 @@ public class ImageService
 
         return AllImages;
     }
+
+    public static async Task<IResult> GetImage(int Id)
+    {
+        ImageRow? Image = await _service.GetImageById(Id);
+        if (Image is not null)
+        {
+            return Results.Ok(Image);
+        }
+        else
+        {
+            return Results.BadRequest();
+        }
+    }
 };
