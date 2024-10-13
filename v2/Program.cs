@@ -50,4 +50,6 @@ app.MapGet("/api/image/{id}", (int id) => ImageService.GetImage(id)).WithTags("I
 // Todo: implement antiforgery
 app.MapPost("/api/image/{id}", (int id, IFormFile ImageFile) => ImageService.PostImage(id, ImageFile)).WithTags("Images").DisableAntiforgery();
 
+app.MapDelete("/api/image/{id}", (int id) => ImageService.DeleteImage(id)).WithTags("Images");
+
 app.Run();

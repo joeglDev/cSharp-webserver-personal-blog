@@ -165,4 +165,42 @@ VALUES (:blogpostId, :name, :img) RETURNING ID";
             await _connection.DisposeAsync();
         }
     }
+
+    public async Task<bool> DeleteImage(int Id)
+    {
+
+        GetConnection();
+
+        if (_connection is null)
+        {
+            throw new Exception("Connection is null");
+        }
+
+        try
+        {
+
+            await _connection.OpenAsync();
+
+            string sql = "DELETE FROM images WHERE Id = :Id";
+
+            using var cmd = new NpgsqlCommand(sql, _connection);
+
+            cmd.Parameters.AddWithValue(":Id", Id);
+
+            int affectedRows = await cmd.ExecuteNonQueryAsync();
+            return affectedRows > 0;
+
+        }
+        catch (Exception Ex)
+        {
+            // todo: add 400 vs 500 error handling here
+            Console.WriteLine($"An error occured deleting image: {Ex}");
+            await _connection.DisposeAsync();
+            return false;
+        }
+        finally
+        {
+            await _connection.DisposeAsync();
+        }
+    }
 }

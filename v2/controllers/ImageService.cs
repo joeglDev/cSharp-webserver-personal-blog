@@ -55,4 +55,18 @@ public class ImageService
             return Results.BadRequest();
         }
     }
+
+    public static async Task<IResult> DeleteImage(int Id)
+    {
+        bool DeleteSucceeded = await _service.DeleteImage(Id);
+
+        if (DeleteSucceeded)
+        {
+            return Results.NoContent();
+        }
+        else
+        {
+            return Results.BadRequest();
+        }
+    }
 };
