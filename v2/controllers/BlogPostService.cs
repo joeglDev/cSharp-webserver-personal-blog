@@ -4,11 +4,10 @@ using System.Collections.Generic;
 using Db;
 using Webserver.Models;
 using Microsoft.AspNetCore.Http;
-using System.Net;
 
 public class BlogPostService
 {
-    private static readonly DatabaseService _service = new DatabaseService();
+    private static readonly BlogPostDatabaseService _service = new BlogPostDatabaseService();
 
     public static async Task<List<BlogPost>> GetAllPosts()
     {

@@ -3,7 +3,7 @@ using Webserver.Models;
 
 namespace Db;
 
-public class DatabaseService() : DatabaseAbstract
+public class BlogPostDatabaseService() : DatabaseAbstract
 {
     public async Task<List<BlogPost>> GetAllBlogPosts()
     {
@@ -211,5 +211,4 @@ public class DatabaseService() : DatabaseAbstract
             await _connection.DisposeAsync();
         }
     }
-
 }
