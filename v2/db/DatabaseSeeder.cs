@@ -19,8 +19,10 @@ public class DatabaseSeeder() : DatabaseAbstract
         {
             await _connection.OpenAsync();
 
-            await CreateBlogPostTableAsync();
+            await CreateTableAsync(_commands.CreateBlogPostTable);
             await InsertDataIfBlogpostTableEmpty();
+
+            await CreateTableAsync(_commands.CreateImageTable);
 
             Console.WriteLine("Seeded database successfully");
         }
@@ -35,18 +37,9 @@ public class DatabaseSeeder() : DatabaseAbstract
         }
     }
 
-    private async Task CreateBlogPostTableAsync()
+    private async Task CreateTableAsync(string SqlCommand)
     {
-        using var cmd = new NpgsqlCommand(
-       @"CREATE TABLE IF NOT EXISTS blogposts (
-            Id SERIAL PRIMARY KEY,
-            Author VARCHAR(255) DEFAULT 'unassigned author',
-            Title VARCHAR(255) DEFAULT 'unassigned title',
-            Content TEXT,
-            TimeStamp TIMESTAMP WITHOUT TIME ZONE,
-            Likes INTEGER DEFAULT 0
-        )",
-       _connection);
+        using var cmd = new NpgsqlCommand(SqlCommand,_connection);
 
         await cmd.ExecuteNonQueryAsync();
     }
