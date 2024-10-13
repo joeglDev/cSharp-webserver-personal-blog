@@ -6,6 +6,7 @@ namespace Db;
 public abstract class DatabaseAbstract
 {
     public NpgsqlConnection? _connection;
+    public DatabaseCommands _commands = new DatabaseCommands();
 
     public static Dictionary<string, string?> GetEnvVariables()
     {

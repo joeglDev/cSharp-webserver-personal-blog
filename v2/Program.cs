@@ -16,7 +16,7 @@ builder.Services.AddCors(options =>
             .WithMethods("GET", "POST", "PATCH", "DELETE")
             .AllowAnyHeader()
             .AllowCredentials());
-});    
+});
 
 var app = builder.Build();
 
@@ -28,16 +28,27 @@ app.UseCors("AllowLocalHost");
 var seeder = new DatabaseSeeder();
 await seeder.SeedDbAsync();
 
-app.MapGet("/api/ping", () => "pong");
+// blogposts 
+app.MapGet("/api/ping", () => "pong").WithTags("General");
 
-app.MapGet("/api/author", () => GetAuthorItemService.GetAuthorItem("Joe Gilbert", "joeglDev"));
+app.MapGet("/api/author", () => GetAuthorItemService.GetAuthorItem("Joe Gilbert", "joeglDev")).WithTags("General");
 
-app.MapGet("/api/posts", () => BlogPostService.GetAllPosts());
+app.MapGet("/api/posts", () => BlogPostService.GetAllPosts()).WithTags("Blog Posts");
 
-app.MapPost("/api/post", (BlogPost NewPost) => BlogPostService.PostBlogPost(NewPost));
+app.MapPost("/api/post", (BlogPost NewPost) => BlogPostService.PostBlogPost(NewPost)).WithTags("Blog Posts");
 
-app.MapDelete("/api/post/{id}", (int id) => BlogPostService.DeleteBlogPost(id));
+app.MapDelete("/api/post/{id}", (int id) => BlogPostService.DeleteBlogPost(id)).WithTags("Blog Posts");
 
-app.MapPatch("/api/post/{id}", (int id, BlogPost UpdatedBlogPost) => BlogPostService.PatchBlogPost(id, UpdatedBlogPost));
+app.MapPatch("/api/post/{id}", (int id, BlogPost UpdatedBlogPost) => BlogPostService.PatchBlogPost(id, UpdatedBlogPost)).WithTags("Blog Posts");
+
+// images
+app.MapGet("/api/images", () => ImageService.GetAllImages()).WithTags("Images");
+
+app.MapGet("/api/image/{id}", (int id) => ImageService.GetImage(id)).WithTags("Images");
+
+// Todo: implement antiforgery
+app.MapPost("/api/image/{id}", (int id, IFormFile ImageFile) => ImageService.PostImage(id, ImageFile)).WithTags("Images").DisableAntiforgery();
+
+app.MapDelete("/api/image/{id}", (int id) => ImageService.DeleteImage(id)).WithTags("Images");
 
 app.Run();
