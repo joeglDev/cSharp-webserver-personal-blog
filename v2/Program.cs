@@ -47,4 +47,7 @@ app.MapGet("/api/images", () => ImageService.GetAllImages()).WithTags("Images");
 
 app.MapGet("/api/image/{id}", (int id) => ImageService.GetImage(id)).WithTags("Images");
 
+// Todo: implement antiforgery
+app.MapPost("/api/image/{id}", (int id, IFormFile ImageFile) => ImageService.PostImage(id, ImageFile)).WithTags("Images").DisableAntiforgery();
+
 app.Run();

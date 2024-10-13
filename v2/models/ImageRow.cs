@@ -4,10 +4,10 @@ public class ImageRow
 {
     public int Id { get; set; }
     public int BlogpostId { get; set; }
-    public string? Name { get; set; }
-    public byte[]? Img { get; set; }
+    public string Name { get; set; }
+    public byte[] Img { get; set; }
 
-    public ImageRow(int id, int blogpostId, string? name = null, byte[]? img = null)
+    public ImageRow(int id, int blogpostId, string name, byte[] img)
     {
         Id = id;
         BlogpostId = blogpostId;

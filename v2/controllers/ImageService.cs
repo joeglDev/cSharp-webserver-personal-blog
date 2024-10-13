@@ -29,4 +29,30 @@ public class ImageService
             return Results.BadRequest();
         }
     }
+
+    private static async Task<byte[]> ConvertIFormFileToByteArray(IFormFile file)
+    {
+        using var memoryStream = new MemoryStream();
+        await file.CopyToAsync(memoryStream);
+        return memoryStream.ToArray();
+    }
+
+    public static async Task<IResult> PostImage(int Id, IFormFile ImageFile)
+    {
+        string Name = ImageFile.Name;
+        byte[] fileBytes = await ConvertIFormFileToByteArray(ImageFile);
+
+        // note does not need Id field
+        ImageRow NewImage = new ImageRow(Id, Id, Name, fileBytes);
+
+        bool InsertSucceeded = await _service.InsertImage(NewImage);
+        if (InsertSucceeded)
+        {
+            return Results.Created("/api/image" + NewImage.Id, NewImage);
+        }
+        else
+        {
+            return Results.BadRequest();
+        }
+    }
 };

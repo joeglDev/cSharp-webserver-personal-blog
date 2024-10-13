@@ -120,4 +120,49 @@ public class ImageDatabaseService() : DatabaseAbstract
             await _connection.DisposeAsync();
         }
     }
+
+    public async Task<bool> InsertImage(ImageRow NewImage)
+    {
+
+        GetConnection();
+
+        if (_connection is null)
+        {
+            throw new Exception("Connection is null");
+        }
+
+        try
+        {
+
+            await _connection.OpenAsync();
+
+            string sql = @"
+INSERT INTO images (blogpost_id, name, img)
+VALUES (:blogpostId, :name, :img) RETURNING ID";
+
+            using var cmd = new NpgsqlCommand(sql, _connection);
+
+            cmd.Parameters.AddWithValue(":blogpostId", NewImage.BlogpostId);
+            cmd.Parameters.AddWithValue(":name", NewImage.Name);
+            cmd.Parameters.AddWithValue(":img", NewImage.Img);
+
+            object? result = cmd.ExecuteScalar();
+            result = (result == DBNull.Value) ? null : result;
+            int id = Convert.ToInt32(result);
+
+            return id > 0;
+
+        }
+        catch (Exception Ex)
+        {
+            // todo: add 400 vs 500 error handling here
+            Console.WriteLine($"An error occured creating the image: {Ex}");
+            await _connection.DisposeAsync();
+            return false;
+        }
+        finally
+        {
+            await _connection.DisposeAsync();
+        }
+    }
 }
