@@ -10,7 +10,7 @@ public class DatabaseCommands
             Likes INTEGER DEFAULT 0
         );";
 
-    public string CreateImageTable = @"CREATE TABLE images (
+    public string CreateImageTable = @"CREATE TABLE IF NOT EXISTS images (
     id SERIAL PRIMARY KEY,
     blogpost_id INTEGER NOT NULL,
     name TEXT,

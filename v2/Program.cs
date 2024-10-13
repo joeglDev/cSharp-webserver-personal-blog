@@ -28,6 +28,7 @@ app.UseCors("AllowLocalHost");
 var seeder = new DatabaseSeeder();
 await seeder.SeedDbAsync();
 
+// blogposts 
 app.MapGet("/api/ping", () => "pong");
 
 app.MapGet("/api/author", () => GetAuthorItemService.GetAuthorItem("Joe Gilbert", "joeglDev"));
@@ -39,5 +40,8 @@ app.MapPost("/api/post", (BlogPost NewPost) => BlogPostService.PostBlogPost(NewP
 app.MapDelete("/api/post/{id}", (int id) => BlogPostService.DeleteBlogPost(id));
 
 app.MapPatch("/api/post/{id}", (int id, BlogPost UpdatedBlogPost) => BlogPostService.PatchBlogPost(id, UpdatedBlogPost));
+
+// images
+
 
 app.Run();
