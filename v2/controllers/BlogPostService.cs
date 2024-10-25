@@ -2,27 +2,27 @@ namespace Webserver.Controllers;
 
 using System.Collections.Generic;
 using Db;
-using Webserver.Models;
+using Models;
 using Microsoft.AspNetCore.Http;
 
 public class BlogPostService
 {
-    private static readonly BlogPostDatabaseService _service = new BlogPostDatabaseService();
+    private static readonly BlogPostDatabaseService Service = new BlogPostDatabaseService();
 
     public static async Task<List<BlogPost>> GetAllPosts()
     {
-        List<BlogPost> AllBlogPosts = await _service.GetAllBlogPosts();
+        List<BlogPost> allBlogPosts = await Service.GetAllBlogPosts();
 
-        return AllBlogPosts;
+        return allBlogPosts;
 
     }
 
-    public static async Task<IResult> PostBlogPost(BlogPost NewPost)
+    public static async Task<IResult> PostBlogPost(BlogPost newPost)
     {
-        bool InsertSucceeded = await _service.InsertBlogPost(NewPost);
-        if (InsertSucceeded)
+        bool insertSucceeded = await Service.InsertBlogPost(newPost);
+        if (insertSucceeded)
         {
-            return Results.Created("/api/posts/" + NewPost.Id, NewPost);
+            return Results.Created("/api/posts/" + newPost.Id, newPost);
         }
         else
         {
@@ -32,9 +32,9 @@ public class BlogPostService
 
     public static async Task<IResult> DeleteBlogPost(int id)
     {
-        bool DeleteSucceeded = await _service.DeleteBlogPost(id);
+        bool deleteSucceeded = await Service.DeleteBlogPost(id);
 
-        if (DeleteSucceeded)
+        if (deleteSucceeded)
         {
             return Results.NoContent();
         }
@@ -44,13 +44,13 @@ public class BlogPostService
         }
     }
 
-    public static async Task<IResult> PatchBlogPost(int id, BlogPost UpdatedBlogPost)
+    public static async Task<IResult> PatchBlogPost(int id, BlogPost updatedBlogPost)
     {
-        BlogPost? PatchResponse = await _service.PatchBlogPost(id, UpdatedBlogPost);
+        BlogPost? patchResponse = await Service.PatchBlogPost(id, updatedBlogPost);
 
-        if (PatchResponse is not null)
+        if (patchResponse is not null)
         {
-            return Results.Ok(PatchResponse);
+            return Results.Ok(patchResponse);
         }
         else
         {

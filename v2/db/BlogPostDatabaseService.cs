@@ -3,7 +3,7 @@ using Webserver.Models;
 
 namespace Db;
 
-public class BlogPostDatabaseService() : DatabaseAbstract
+public class BlogPostDatabaseService : DatabaseAbstract
 {
     public async Task<List<BlogPost>> GetAllBlogPosts()
     {

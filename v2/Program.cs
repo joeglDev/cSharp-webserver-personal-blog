@@ -11,7 +11,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowLocalHost",
-        builder => builder
+        policy => policy
             .WithOrigins("http://localhost:3000")
             .WithMethods("GET", "POST", "PATCH", "DELETE")
             .AllowAnyHeader()
@@ -35,11 +35,11 @@ app.MapGet("/api/author", () => GetAuthorItemService.GetAuthorItem("Joe Gilbert"
 
 app.MapGet("/api/posts", () => BlogPostService.GetAllPosts()).WithTags("Blog Posts");
 
-app.MapPost("/api/post", (BlogPost NewPost) => BlogPostService.PostBlogPost(NewPost)).WithTags("Blog Posts");
+app.MapPost("/api/post", (BlogPost newPost) => BlogPostService.PostBlogPost(newPost)).WithTags("Blog Posts");
 
 app.MapDelete("/api/post/{id}", (int id) => BlogPostService.DeleteBlogPost(id)).WithTags("Blog Posts");
 
-app.MapPatch("/api/post/{id}", (int id, BlogPost UpdatedBlogPost) => BlogPostService.PatchBlogPost(id, UpdatedBlogPost)).WithTags("Blog Posts");
+app.MapPatch("/api/post/{id}", (int id, BlogPost updatedBlogPost) => BlogPostService.PatchBlogPost(id, updatedBlogPost)).WithTags("Blog Posts");
 
 // images
 app.MapGet("/api/images", () => ImageService.GetAllImages()).WithTags("Images");
@@ -47,7 +47,7 @@ app.MapGet("/api/images", () => ImageService.GetAllImages()).WithTags("Images");
 app.MapGet("/api/image/{id}", (int id) => ImageService.GetImage(id)).WithTags("Images");
 
 // Todo: implement antiforgery
-app.MapPost("/api/image/{id}", (int id, IFormFile ImageFile) => ImageService.PostImage(id, ImageFile)).WithTags("Images").DisableAntiforgery();
+app.MapPost("/api/image/{id}", (int id, IFormFile imageFile) => ImageService.PostImage(id, imageFile)).WithTags("Images").DisableAntiforgery();
 
 app.MapDelete("/api/image/{id}", (int id) => ImageService.DeleteImage(id)).WithTags("Images");
 

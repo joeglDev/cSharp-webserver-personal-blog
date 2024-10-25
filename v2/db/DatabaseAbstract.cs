@@ -8,7 +8,7 @@ public abstract class DatabaseAbstract
     public NpgsqlConnection? _connection;
     public DatabaseCommands _commands = new DatabaseCommands();
 
-    public static Dictionary<string, string?> GetEnvVariables()
+    private static Dictionary<string, string?> GetEnvVariables()
     {
         var root = Directory.GetCurrentDirectory();
         var dotenv = Path.Combine(root, ".env");
