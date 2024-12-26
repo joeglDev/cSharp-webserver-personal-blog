@@ -1,8 +1,7 @@
-namespace Webserver.Controllers;
+namespace v2.Controllers;
 
-using System.Collections.Generic;
-using Db;
-using Models;
+using v2.Db;
+using v2.Models;
 using Microsoft.AspNetCore.Http;
 
 public class BlogPostService
@@ -19,7 +18,7 @@ public class BlogPostService
 
     public static async Task<IResult> PostBlogPost(BlogPost newPost)
     {
-        bool insertSucceeded = await Service.InsertBlogPost(newPost);
+        var insertSucceeded = await Service.InsertBlogPost(newPost);
         if (insertSucceeded)
         {
             return Results.Created("/api/posts/" + newPost.Id, newPost);
@@ -32,7 +31,7 @@ public class BlogPostService
 
     public static async Task<IResult> DeleteBlogPost(int id)
     {
-        bool deleteSucceeded = await Service.DeleteBlogPost(id);
+        var deleteSucceeded = await Service.DeleteBlogPost(id);
 
         if (deleteSucceeded)
         {
@@ -46,7 +45,7 @@ public class BlogPostService
 
     public static async Task<IResult> PatchBlogPost(int id, BlogPost updatedBlogPost)
     {
-        BlogPost? patchResponse = await Service.PatchBlogPost(id, updatedBlogPost);
+        var patchResponse = await Service.PatchBlogPost(id, updatedBlogPost);
 
         if (patchResponse is not null)
         {

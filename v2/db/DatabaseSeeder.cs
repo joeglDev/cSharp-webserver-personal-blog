@@ -1,6 +1,6 @@
 using Npgsql;
 
-namespace Db;
+namespace v2.Db;
 
 public class DatabaseSeeder() : DatabaseAbstract
 {
@@ -10,52 +10,47 @@ public class DatabaseSeeder() : DatabaseAbstract
 
         GetConnection();
 
-        if (_connection is null)
+        if (Connection is null)
         {
             throw new Exception("Connection is null");
         }
 
         try
         {
-            await _connection.OpenAsync();
+            await Connection.OpenAsync();
 
             // Create BlogPost table
-            await CreateTableAsync(_commands.CreateBlogPostTable);
+            await CreateTableAsync(Commands.CreateBlogPostTable);
             await InsertDataIfBlogpostTableEmpty();
 
             // Create Image Table
-            await CreateTableAsync(_commands.CreateImageTable);
+            await CreateTableAsync(Commands.CreateImageTable);
             await InsertDataIfImageTableEmpty();
 
             Console.WriteLine("Seeded database successfully");
         }
-        catch (Exception Ex)
+        catch (Exception ex)
         {
-            Console.WriteLine($"An error occured while seeding the database: {Ex}");
+            Console.WriteLine($"An error occured while seeding the database: {ex}");
             throw;
         }
         finally
         {
-            await _connection.DisposeAsync();
+            await Connection.DisposeAsync();
         }
     }
 
-    private async Task CreateTableAsync(string SqlCommand)
+    private async Task CreateTableAsync(string sqlCommand)
     {
-        using var cmd = new NpgsqlCommand(SqlCommand, _connection);
+        using var cmd = new NpgsqlCommand(sqlCommand, Connection);
 
         await cmd.ExecuteNonQueryAsync();
     }
 
     private async Task InsertDataIfBlogpostTableEmpty()
     {
-        string insertQuery = @"INSERT INTO blogposts (Author, Title, Content, TimeStamp, Likes)
-SELECT :author, :title, :content, :timestamp, :likes
-WHERE NOT EXISTS (
-    SELECT 1 FROM blogposts WHERE Author = :author AND Title = :title
-);";
 
-        using var cmd = new NpgsqlCommand(insertQuery, _connection);
+        using var cmd = new NpgsqlCommand(Commands.InsertIntoBlogPostsIfEmpty, Connection);
 
         // Set parameter values
         DateTime now = DateTime.Now;
@@ -71,13 +66,7 @@ WHERE NOT EXISTS (
 
     private async Task InsertDataIfImageTableEmpty()
     {
-        string insertQuery = @"
-INSERT INTO images (blogpost_id, name, img)
-SELECT :blogpostId, :name, :img
-WHERE NOT EXISTS (
-    SELECT 1 FROM images WHERE blogpost_id = :blogpostId
-)";
-        using var cmd = new NpgsqlCommand(insertQuery, _connection);
+        using var cmd = new NpgsqlCommand(Commands.InsertIntoImageTableIfEmpty, Connection);
 
         // get image file 
         var currentDirectory = Directory.GetCurrentDirectory();

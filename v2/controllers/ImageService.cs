@@ -1,9 +1,9 @@
 
-namespace Webserver.Controllers;
+namespace v2.Controllers;
 
 using System.Collections.Generic;
-using Db;
-using Models;
+using v2.Db;
+using v2.Models;
 
 
 public class ImageService
@@ -43,7 +43,7 @@ public class ImageService
         byte[] fileBytes = await ConvertIFormFileToByteArray(imageFile);
 
         // note does not need Id field
-        ImageRow newImage = new ImageRow(id, id, name, fileBytes);
+        var newImage = new ImageRow(id, id, name, fileBytes);
 
         bool insertSucceeded = await Service.InsertImage(newImage);
         if (insertSucceeded)
@@ -58,7 +58,7 @@ public class ImageService
 
     public static async Task<IResult> DeleteImage(int id)
     {
-        bool deleteSucceeded = await Service.DeleteImage(id);
+        var deleteSucceeded = await Service.DeleteImage(id);
 
         if (deleteSucceeded)
         {

@@ -1,4 +1,4 @@
-namespace Webserver.Models;
+namespace v2.Models;
 
 public sealed class AuthorItem
 {

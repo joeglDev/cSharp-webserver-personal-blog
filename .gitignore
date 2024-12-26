@@ -5,3 +5,5 @@ appsettings.*
 bin
 
 .env
+.idea/
+ cSharp-webserver-personal-blog.sln.DotSettings.user
