@@ -1,7 +1,7 @@
 using Npgsql;
-using Webserver.Models;
+using v2.Models;
 
-namespace Db;
+namespace v2.Db;
 
 public class ImageDatabaseService() : DatabaseAbstract
 {
@@ -29,7 +29,7 @@ public class ImageDatabaseService() : DatabaseAbstract
 
         GetConnection();
 
-        if (_connection is null)
+        if (Connection is null)
         {
             throw new Exception("Connection is null");
         }
@@ -37,12 +37,12 @@ public class ImageDatabaseService() : DatabaseAbstract
         try
         {
 
-            await _connection.OpenAsync();
+            await Connection.OpenAsync();
 
-            using var cmd = new NpgsqlBatch(_connection)
+            using var cmd = new NpgsqlBatch(Connection)
             {
                 BatchCommands = {
-                    new NpgsqlBatchCommand("SELECT * FROM images;")
+                    new NpgsqlBatchCommand(Commands.SelectAllImages)
                 }
             };
 
@@ -63,42 +63,40 @@ public class ImageDatabaseService() : DatabaseAbstract
             return images;
 
         }
-        catch (Exception Ex)
+        catch (Exception ex)
         {
-            Console.WriteLine($"An error occured reading all blog posts: {Ex}");
+            Console.WriteLine($"An error occured reading all blog posts: {ex}");
             return [];
         }
         finally
         {
-            await _connection.DisposeAsync();
+            await Connection.DisposeAsync();
         }
     }
 
-    public async Task<ImageRow?> GetImageById(int Id)
+    public async Task<ImageRow?> GetImageById(int id)
     {
-        List<ImageRow> images = [];
-
         GetConnection();
 
-        if (_connection is null)
+        if (Connection is null)
         {
             throw new Exception("Connection is null");
         }
 
         try
         {
-            List<ImageRow> Images = [];
-            await _connection.OpenAsync();
+            List<ImageRow> images = [];
+            await Connection.OpenAsync();
 
-            using var cmd = new NpgsqlCommand("SELECT * FROM images WHERE id = :id;", _connection);
+            using var cmd = new NpgsqlCommand(Commands.SelectImage, Connection);
 
-            cmd.Parameters.AddWithValue(":id", Id);
+            cmd.Parameters.AddWithValue(":id", id);
 
             using var reader = await cmd.ExecuteReaderAsync();
 
             while (await reader.ReadAsync())
             {
-                Images.Add(new ImageRow(
+                images.Add(new ImageRow(
                 reader.GetInt32(ordinal: 0), // Id
                 reader.GetInt32(ordinal: 1), // blogpost_id
                 reader.GetString(ordinal: 2), // name
@@ -108,25 +106,25 @@ public class ImageDatabaseService() : DatabaseAbstract
             }
 
             await reader.CloseAsync();
-            return Images[0];
+            return images[0];
         }
-        catch (Exception Ex)
+        catch (Exception ex)
         {
-            Console.WriteLine($"An error occured reading all blog posts: {Ex}");
+            Console.WriteLine($"An error occured reading all blog posts: {ex}");
             return null;
         }
         finally
         {
-            await _connection.DisposeAsync();
+            await Connection.DisposeAsync();
         }
     }
 
-    public async Task<bool> InsertImage(ImageRow NewImage)
+    public async Task<bool> InsertImage(ImageRow newImage)
     {
 
         GetConnection();
 
-        if (_connection is null)
+        if (Connection is null)
         {
             throw new Exception("Connection is null");
         }
@@ -134,17 +132,13 @@ public class ImageDatabaseService() : DatabaseAbstract
         try
         {
 
-            await _connection.OpenAsync();
+            await Connection.OpenAsync();
 
-            string sql = @"
-INSERT INTO images (blogpost_id, name, img)
-VALUES (:blogpostId, :name, :img) RETURNING ID";
+            using var cmd = new NpgsqlCommand(Commands.InsertImage, Connection);
 
-            using var cmd = new NpgsqlCommand(sql, _connection);
-
-            cmd.Parameters.AddWithValue(":blogpostId", NewImage.BlogpostId);
-            cmd.Parameters.AddWithValue(":name", NewImage.Name);
-            cmd.Parameters.AddWithValue(":img", NewImage.Img);
+            cmd.Parameters.AddWithValue(":blogpostId", newImage.BlogpostId);
+            cmd.Parameters.AddWithValue(":name", newImage.Name);
+            cmd.Parameters.AddWithValue(":img", newImage.Img);
 
             object? result = cmd.ExecuteScalar();
             result = (result == DBNull.Value) ? null : result;
@@ -153,25 +147,25 @@ VALUES (:blogpostId, :name, :img) RETURNING ID";
             return id > 0;
 
         }
-        catch (Exception Ex)
+        catch (Exception ex)
         {
             // todo: add 400 vs 500 error handling here
-            Console.WriteLine($"An error occured creating the image: {Ex}");
-            await _connection.DisposeAsync();
+            Console.WriteLine($"An error occured creating the image: {ex}");
+            await Connection.DisposeAsync();
             return false;
         }
         finally
         {
-            await _connection.DisposeAsync();
+            await Connection.DisposeAsync();
         }
     }
 
-    public async Task<bool> DeleteImage(int Id)
+    public async Task<bool> DeleteImage(int id)
     {
 
         GetConnection();
 
-        if (_connection is null)
+        if (Connection is null)
         {
             throw new Exception("Connection is null");
         }
@@ -179,28 +173,26 @@ VALUES (:blogpostId, :name, :img) RETURNING ID";
         try
         {
 
-            await _connection.OpenAsync();
+            await Connection.OpenAsync();
 
-            string sql = "DELETE FROM images WHERE Id = :Id";
+            using var cmd = new NpgsqlCommand(Commands.DeleteImage, Connection);
 
-            using var cmd = new NpgsqlCommand(sql, _connection);
-
-            cmd.Parameters.AddWithValue(":Id", Id);
+            cmd.Parameters.AddWithValue(":Id", id);
 
             int affectedRows = await cmd.ExecuteNonQueryAsync();
             return affectedRows > 0;
 
         }
-        catch (Exception Ex)
+        catch (Exception ex)
         {
             // todo: add 400 vs 500 error handling here
-            Console.WriteLine($"An error occured deleting image: {Ex}");
-            await _connection.DisposeAsync();
+            Console.WriteLine($"An error occured deleting image: {ex}");
+            await Connection.DisposeAsync();
             return false;
         }
         finally
         {
-            await _connection.DisposeAsync();
+            await Connection.DisposeAsync();
         }
     }
 }

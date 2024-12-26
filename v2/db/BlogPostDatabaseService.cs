@@ -1,9 +1,9 @@
 using Npgsql;
-using Webserver.Models;
+using v2.Models;
 
-namespace Db;
+namespace v2.Db;
 
-public class BlogPostDatabaseService() : DatabaseAbstract
+public class BlogPostDatabaseService : DatabaseAbstract
 {
     public async Task<List<BlogPost>> GetAllBlogPosts()
     {
@@ -11,7 +11,7 @@ public class BlogPostDatabaseService() : DatabaseAbstract
 
         GetConnection();
 
-        if (_connection is null)
+        if (Connection is null)
         {
             throw new Exception("Connection is null");
         }
@@ -19,12 +19,12 @@ public class BlogPostDatabaseService() : DatabaseAbstract
         try
         {
 
-            await _connection.OpenAsync();
+            await Connection.OpenAsync();
 
-            using var cmd = new NpgsqlBatch(_connection)
+            using var cmd = new NpgsqlBatch(Connection)
             {
                 BatchCommands = {
-                    new NpgsqlBatchCommand("SELECT * FROM blogposts;")
+                    new NpgsqlBatchCommand(Commands.SelectAllBlogPosts)
                 }
             };
 
@@ -46,23 +46,23 @@ public class BlogPostDatabaseService() : DatabaseAbstract
             return posts;
 
         }
-        catch (Exception Ex)
+        catch (Exception ex)
         {
-            Console.WriteLine($"An error occured reading all blog posts: {Ex}");
+            Console.WriteLine($"An error occured reading all blog posts: {ex}");
             return [];
         }
         finally
         {
-            await _connection.DisposeAsync();
+            await Connection.DisposeAsync();
         }
     }
 
-    public async Task<bool> InsertBlogPost(BlogPost NewPost)
+    public async Task<bool> InsertBlogPost(BlogPost newPost)
     {
 
         GetConnection();
 
-        if (_connection is null)
+        if (Connection is null)
         {
             throw new Exception("Connection is null");
         }
@@ -70,32 +70,15 @@ public class BlogPostDatabaseService() : DatabaseAbstract
         try
         {
 
-            await _connection.OpenAsync();
+            await Connection.OpenAsync();
 
-            string sql = @"
-            INSERT INTO BlogPosts (
-                Author,
-                Title,
-                Content,
-                TimeStamp,
-                Likes
-            )
-            VALUES (
-                :Author,
-                :Title,
-                :Content,
-                :TimeStamp,
-                :Likes
-            )
-            RETURNING Id";
+            using var cmd = new NpgsqlCommand(Commands.InsertBlogPost, Connection);
 
-            using var cmd = new NpgsqlCommand(sql, _connection);
-
-            cmd.Parameters.AddWithValue(":Author", NewPost.Author);
-            cmd.Parameters.AddWithValue(":Title", NewPost.Title);
-            cmd.Parameters.AddWithValue(":Content", NewPost.Content);
-            cmd.Parameters.AddWithValue(":TimeStamp", NewPost.TimeStamp);
-            cmd.Parameters.AddWithValue(":Likes", NewPost.Likes);
+            cmd.Parameters.AddWithValue(":Author", newPost.Author);
+            cmd.Parameters.AddWithValue(":Title", newPost.Title);
+            cmd.Parameters.AddWithValue(":Content", newPost.Content);
+            cmd.Parameters.AddWithValue(":TimeStamp", newPost.TimeStamp);
+            cmd.Parameters.AddWithValue(":Likes", newPost.Likes);
 
             object? result = cmd.ExecuteScalar();
             result = (result == DBNull.Value) ? null : result;
@@ -104,25 +87,25 @@ public class BlogPostDatabaseService() : DatabaseAbstract
             return id > 0;
 
         }
-        catch (Exception Ex)
+        catch (Exception ex)
         {
             // todo: add 400 vs 500 error handling here
-            Console.WriteLine($"An error occured creating a blog post: {Ex}");
-            await _connection.DisposeAsync();
+            Console.WriteLine($"An error occured creating a blog post: {ex}");
+            await Connection.DisposeAsync();
             return false;
         }
         finally
         {
-            await _connection.DisposeAsync();
+            await Connection.DisposeAsync();
         }
     }
 
-    public async Task<bool> DeleteBlogPost(int Id)
+    public async Task<bool> DeleteBlogPost(int id)
     {
 
         GetConnection();
 
-        if (_connection is null)
+        if (Connection is null)
         {
             throw new Exception("Connection is null");
         }
@@ -130,37 +113,35 @@ public class BlogPostDatabaseService() : DatabaseAbstract
         try
         {
 
-            await _connection.OpenAsync();
+            await Connection.OpenAsync();
 
-            string sql = @"DELETE FROM blogposts WHERE Id = :Id";
+            using var cmd = new NpgsqlCommand(Commands.DeleteBlogPost, Connection);
 
-            using var cmd = new NpgsqlCommand(sql, _connection);
-
-            cmd.Parameters.AddWithValue(":Id", Id);
+            cmd.Parameters.AddWithValue(":Id", id);
 
             int affectedRows = await cmd.ExecuteNonQueryAsync();
             return affectedRows > 0;
 
         }
-        catch (Exception Ex)
+        catch (Exception ex)
         {
             // todo: add 400 vs 500 error handling here
-            Console.WriteLine($"An error occured deleting a blog post: {Ex}");
-            await _connection.DisposeAsync();
+            Console.WriteLine($"An error occured deleting a blog post: {ex}");
+            await Connection.DisposeAsync();
             return false;
         }
         finally
         {
-            await _connection.DisposeAsync();
+            await Connection.DisposeAsync();
         }
     }
 
-    public async Task<BlogPost?> PatchBlogPost(int Id, BlogPost UpdatedPost)
+    public async Task<BlogPost?> PatchBlogPost(int id, BlogPost updatedPost)
     {
 
         GetConnection();
 
-        if (_connection is null)
+        if (Connection is null)
         {
             throw new Exception("Connection is null");
         }
@@ -168,24 +149,22 @@ public class BlogPostDatabaseService() : DatabaseAbstract
         try
         {
 
-            await _connection.OpenAsync();
+            await Connection.OpenAsync();
 
-            string sql = @"UPDATE BlogPosts SET Author=:Author, Title=:Title, Content=:Content, TimeStamp=TimeStamp, Likes=:Likes WHERE Id = :Id RETURNING *;";
+            using var cmd = new NpgsqlCommand(Commands.UpdateBlogPost, Connection);
 
-            using var cmd = new NpgsqlCommand(sql, _connection);
-
-            cmd.Parameters.AddWithValue(":Author", UpdatedPost.Author);
-            cmd.Parameters.AddWithValue(":Title", UpdatedPost.Title);
-            cmd.Parameters.AddWithValue(":Content", UpdatedPost.Content);
-            cmd.Parameters.AddWithValue(":TimeStamp", UpdatedPost.TimeStamp);
-            cmd.Parameters.AddWithValue(":Likes", UpdatedPost.Likes);
-            cmd.Parameters.AddWithValue(":Id", Id);
+            cmd.Parameters.AddWithValue(":Author", updatedPost.Author);
+            cmd.Parameters.AddWithValue(":Title", updatedPost.Title);
+            cmd.Parameters.AddWithValue(":Content", updatedPost.Content);
+            cmd.Parameters.AddWithValue(":TimeStamp", updatedPost.TimeStamp);
+            cmd.Parameters.AddWithValue(":Likes", updatedPost.Likes);
+            cmd.Parameters.AddWithValue(":Id", id);
 
             using var reader = await cmd.ExecuteReaderAsync();
 
             while (await reader.ReadAsync())
             {
-                var updatedPost = new BlogPost(
+                new BlogPost(
                     reader.GetInt32(ordinal: 0), // Id
                     reader.GetString(ordinal: 1), // Author
                     reader.GetString(ordinal: 2), // Title
@@ -197,18 +176,18 @@ public class BlogPostDatabaseService() : DatabaseAbstract
 
             await reader.CloseAsync();
 
-            return UpdatedPost;
+            return updatedPost;
         }
-        catch (Exception Ex)
+        catch (Exception ex)
         {
             // todo: add 400 vs 500 error handling here
-            Console.WriteLine($"An error occured patching a blog post: {Ex}");
-            await _connection.DisposeAsync();
+            Console.WriteLine($"An error occured patching a blog post: {ex}");
+            await Connection.DisposeAsync();
             return null;
         }
         finally
         {
-            await _connection.DisposeAsync();
+            await Connection.DisposeAsync();
         }
     }
 }

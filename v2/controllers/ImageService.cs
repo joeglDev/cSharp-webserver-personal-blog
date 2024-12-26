@@ -1,28 +1,28 @@
 
-namespace Webserver.Controllers;
+namespace v2.Controllers;
 
 using System.Collections.Generic;
-using Db;
-using Webserver.Models;
+using v2.Db;
+using v2.Models;
 
 
 public class ImageService
 {
-    private static readonly ImageDatabaseService _service = new ImageDatabaseService();
+    private static readonly ImageDatabaseService Service = new ImageDatabaseService();
 
     public static async Task<List<ImageRow>> GetAllImages()
     {
-        List<ImageRow> AllImages = await _service.GetAllImages();
+        List<ImageRow> allImages = await Service.GetAllImages();
 
-        return AllImages;
+        return allImages;
     }
 
-    public static async Task<IResult> GetImage(int Id)
+    public static async Task<IResult> GetImage(int id)
     {
-        ImageRow? Image = await _service.GetImageById(Id);
-        if (Image is not null)
+        ImageRow? image = await Service.GetImageById(id);
+        if (image is not null)
         {
-            return Results.Ok(Image);
+            return Results.Ok(image);
         }
         else
         {
@@ -37,18 +37,18 @@ public class ImageService
         return memoryStream.ToArray();
     }
 
-    public static async Task<IResult> PostImage(int Id, IFormFile ImageFile)
+    public static async Task<IResult> PostImage(int id, IFormFile imageFile)
     {
-        string Name = ImageFile.Name;
-        byte[] fileBytes = await ConvertIFormFileToByteArray(ImageFile);
+        string name = imageFile.Name;
+        byte[] fileBytes = await ConvertIFormFileToByteArray(imageFile);
 
         // note does not need Id field
-        ImageRow NewImage = new ImageRow(Id, Id, Name, fileBytes);
+        var newImage = new ImageRow(id, id, name, fileBytes);
 
-        bool InsertSucceeded = await _service.InsertImage(NewImage);
-        if (InsertSucceeded)
+        bool insertSucceeded = await Service.InsertImage(newImage);
+        if (insertSucceeded)
         {
-            return Results.Created("/api/image" + NewImage.Id, NewImage);
+            return Results.Created("/api/image" + newImage.Id, newImage);
         }
         else
         {
@@ -56,11 +56,11 @@ public class ImageService
         }
     }
 
-    public static async Task<IResult> DeleteImage(int Id)
+    public static async Task<IResult> DeleteImage(int id)
     {
-        bool DeleteSucceeded = await _service.DeleteImage(Id);
+        var deleteSucceeded = await Service.DeleteImage(id);
 
-        if (DeleteSucceeded)
+        if (deleteSucceeded)
         {
             return Results.NoContent();
         }

@@ -1,11 +1,11 @@
-namespace Webserver.Controllers;
+namespace v2.Controllers;
 
-using Webserver.Models;
+using v2.Models;
 
 public class GetAuthorItemService {
     public static AuthorItem GetAuthorItem(string name, string githubUsername)
     {
-        AuthorItem myAuthorDetails = new AuthorItem { Name = name, GithubUsername = githubUsername };
+        var myAuthorDetails = new AuthorItem { Name = name, GithubUsername = githubUsername };
         return myAuthorDetails;
     }
 };
