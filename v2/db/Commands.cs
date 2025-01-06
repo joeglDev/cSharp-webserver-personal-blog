@@ -23,7 +23,7 @@ public class DatabaseCommands
 )";
 
     public string SelectAllBlogPosts = "SELECT * FROM blogposts;";
-    
+
     public string InsertBlogPost = @"
             INSERT INTO BlogPosts (
                 Author,
@@ -42,15 +42,15 @@ public class DatabaseCommands
             RETURNING Id";
 
     public string DeleteBlogPost = @"DELETE FROM blogposts WHERE Id = :Id";
-    
+
     public string UpdateBlogPost = @"UPDATE BlogPosts SET Author=:Author, Title=:Title, Content=:Content, TimeStamp=TimeStamp, Likes=:Likes WHERE Id = :Id RETURNING *;";
-    
+
     public string InsertIntoBlogPostsIfEmpty = @"INSERT INTO blogposts (Author, Title, Content, TimeStamp, Likes)
 SELECT :author, :title, :content, :timestamp, :likes
 WHERE NOT EXISTS (
     SELECT 1 FROM blogposts WHERE Author = :author AND Title = :title
 );";
-    
+
     public string InsertIntoImageTableIfEmpty = @"
 INSERT INTO images (blogpost_id, name, img)
 SELECT :blogpostId, :name, :img
@@ -61,7 +61,7 @@ WHERE NOT EXISTS (
     public string SelectAllImages = "SELECT * FROM images;";
 
     public string SelectImage = "SELECT * FROM images WHERE blogpost_id = :blogpost_id;"; // TODO replicate this below
-    
+
     public string InsertImage = @"
 INSERT INTO images (blogpost_id, name, img)
 VALUES (:blogpostId, :name, :img) RETURNING ID";

@@ -3,6 +3,13 @@ using v2.Models;
 
 namespace v2.Db;
 
+/* TODO: Do not store connection state globally in class instead get a new one each time
+  using(var connection = new OleDbConnection(conString))
+      {
+          connection.Open();
+          // do your stuff here...
+      }
+ */
 public class BlogPostDatabaseService : DatabaseAbstract
 {
     public async Task<List<BlogPost>> GetAllBlogPosts()
