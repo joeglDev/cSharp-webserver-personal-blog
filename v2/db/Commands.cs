@@ -60,11 +60,11 @@ WHERE NOT EXISTS (
 
     public string SelectAllImages = "SELECT * FROM images;";
 
-    public string SelectImage = "SELECT * FROM images WHERE id = :id;";
+    public string SelectImage = "SELECT * FROM images WHERE blogpost_id = :blogpost_id;"; // TODO replicate this below
     
     public string InsertImage = @"
 INSERT INTO images (blogpost_id, name, img)
 VALUES (:blogpostId, :name, :img) RETURNING ID";
 
-    public string DeleteImage = "DELETE FROM images WHERE Id = :Id";
+    public string DeleteImage = "DELETE FROM images WHERE blogpost_id = :blogpost_id";
 }
