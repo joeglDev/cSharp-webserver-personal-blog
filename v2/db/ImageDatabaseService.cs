@@ -3,6 +3,7 @@ using v2.Models;
 
 namespace v2.Db;
 
+// TODO: move connection to creation of class
 public class ImageDatabaseService() : DatabaseAbstract
 {
     private static async Task<byte[]> ReadBytesFromReader(NpgsqlDataReader reader, int ordinal)
@@ -73,8 +74,9 @@ public class ImageDatabaseService() : DatabaseAbstract
             await Connection.DisposeAsync();
         }
     }
-
-    public async Task<ImageRow?> GetImageById(int id)
+    
+    // TODO: add http 404 not found err handling
+    public async Task<ImageRow?> GetImageById(int blogpostId)
     {
         GetConnection();
 
@@ -86,11 +88,11 @@ public class ImageDatabaseService() : DatabaseAbstract
         try
         {
             List<ImageRow> images = [];
-            await Connection.OpenAsync();
+            await Connection.OpenAsync(); // TODO: NOT ASYNC???
 
             using var cmd = new NpgsqlCommand(Commands.SelectImage, Connection);
 
-            cmd.Parameters.AddWithValue(":id", id);
+            cmd.Parameters.AddWithValue(":blogpost_id", blogpostId);
 
             using var reader = await cmd.ExecuteReaderAsync();
 
@@ -106,7 +108,7 @@ public class ImageDatabaseService() : DatabaseAbstract
             }
 
             await reader.CloseAsync();
-            return images[0];
+            return images[0]; // FIX THIS
         }
         catch (Exception ex)
         {
@@ -160,7 +162,7 @@ public class ImageDatabaseService() : DatabaseAbstract
         }
     }
 
-    public async Task<bool> DeleteImage(int id)
+    public async Task<bool> DeleteImage(int blogpostId)
     {
 
         GetConnection();
@@ -177,7 +179,7 @@ public class ImageDatabaseService() : DatabaseAbstract
 
             using var cmd = new NpgsqlCommand(Commands.DeleteImage, Connection);
 
-            cmd.Parameters.AddWithValue(":Id", id);
+            cmd.Parameters.AddWithValue(":blogpost_id", blogpostId);
 
             int affectedRows = await cmd.ExecuteNonQueryAsync();
             return affectedRows > 0;
