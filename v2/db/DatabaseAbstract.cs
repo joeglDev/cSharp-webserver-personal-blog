@@ -25,7 +25,7 @@ public abstract class DatabaseAbstract
         return envVars;
     }
 
-    public void GetConnection()
+    public NpgsqlConnection GetIndividualConnection()
     {
         Console.WriteLine("Setting the connection string");
 
@@ -34,7 +34,7 @@ public abstract class DatabaseAbstract
         string connectionString = $"Host={envVars["HOST"]};database={envVars["DATABASE"]};Username={envVars["USERNAME"]};Password={envVars["PASSWORD"]};";
 
         var connection = new NpgsqlConnection(connectionString);
-        Connection = connection;
+        return connection;
     }
 
 }
