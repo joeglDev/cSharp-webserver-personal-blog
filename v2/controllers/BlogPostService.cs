@@ -53,7 +53,7 @@ public class BlogPostService
         }
         else
         {
-            return Results.BadRequest();
+            return Results.NotFound();
         }
     }
 };

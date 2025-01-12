@@ -87,7 +87,7 @@ public class BlogPostDatabaseService : DatabaseAbstract
             }
             catch (Exception ex)
             {
-                // todo: add 400 vs 500 error handling here
+                // todo: add 400 error handling here
                 Console.WriteLine($"An error occured creating a blog post: {ex}");
                 await conn.CloseAsync();
                 return false;
@@ -120,7 +120,8 @@ public class BlogPostDatabaseService : DatabaseAbstract
             }
             catch (Exception ex)
             {
-                // todo: add 400 vs 500 error handling here
+                // todo: add 400 error handling here
+                // todo: add 404 error handling
                 Console.WriteLine($"An error occured deleting a blog post: {ex}");
                 await conn.CloseAsync();
                 return false;
@@ -130,7 +131,6 @@ public class BlogPostDatabaseService : DatabaseAbstract
 
     public async Task<BlogPost?> PatchBlogPost(int id, BlogPost updatedPost)
     {
-
         using (var conn = GetIndividualConnection())
         {
             if (conn is null)
@@ -152,27 +152,14 @@ public class BlogPostDatabaseService : DatabaseAbstract
                 cmd.Parameters.AddWithValue(":Likes", updatedPost.Likes);
                 cmd.Parameters.AddWithValue(":Id", id);
 
-                using var reader = await cmd.ExecuteReaderAsync();
+                var result = await cmd.ExecuteNonQueryAsync();
 
-                while (await reader.ReadAsync())
-                {
-                    new BlogPost(
-                        reader.GetInt32(ordinal: 0), // Id
-                        reader.GetString(ordinal: 1), // Author
-                        reader.GetString(ordinal: 2), // Title
-                        reader.GetString(ordinal: 3), // Content
-                        reader.GetDateTime(ordinal: 4), // TimeStamp
-                        reader.GetInt32(ordinal: 5)   // Likes
-                    );
-                }
-
-                await reader.CloseAsync();
-
-                return updatedPost;
+                // handle 404 blog post not found
+                return result != 1 ? null : updatedPost;
             }
             catch (Exception ex)
             {
-                // todo: add 400 vs 500 error handling here
+                // todo: add 400  error handling here
                 Console.WriteLine($"An error occured patching a blog post: {ex}");
                 await conn.CloseAsync();
                 return null;

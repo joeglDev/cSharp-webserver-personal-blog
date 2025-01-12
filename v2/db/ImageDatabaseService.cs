@@ -153,7 +153,7 @@ public class ImageDatabaseService() : DatabaseAbstract
             }
             catch (Exception ex)
             {
-                // todo: add 400 vs 500 error handling here
+                // todo: add 400 error handling here
                 Console.WriteLine($"An error occured creating the image: {ex}");
                 await conn.CloseAsync();
                 return false;
@@ -188,7 +188,8 @@ public class ImageDatabaseService() : DatabaseAbstract
             }
             catch (Exception ex)
             {
-                // todo: add 400 vs 500 error handling here
+                // todo: add 404 error handling here
+                // todo: add 400 error handling
                 Console.WriteLine($"An error occured deleting image: {ex}");
                 await conn.CloseAsync();
                 return false;
