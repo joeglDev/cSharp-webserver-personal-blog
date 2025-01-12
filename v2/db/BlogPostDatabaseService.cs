@@ -95,7 +95,7 @@ public class BlogPostDatabaseService : DatabaseAbstract
         }
     }
 
-    public async Task<bool> DeleteBlogPost(int id)
+    public async Task<int> DeleteBlogPost(int id)
     {
 
         using (var conn = GetIndividualConnection())
@@ -114,17 +114,17 @@ public class BlogPostDatabaseService : DatabaseAbstract
 
                 cmd.Parameters.AddWithValue(":Id", id);
 
-                int affectedRows = await cmd.ExecuteNonQueryAsync();
-                return affectedRows > 0;
+                int result = await cmd.ExecuteNonQueryAsync();
+
+                return result;
 
             }
             catch (Exception ex)
             {
                 // todo: add 400 error handling here
-                // todo: add 404 error handling
                 Console.WriteLine($"An error occured deleting a blog post: {ex}");
                 await conn.CloseAsync();
-                return false;
+                throw;
             }
         }
     }
