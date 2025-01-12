@@ -8,49 +8,47 @@ public class DatabaseSeeder() : DatabaseAbstract
     {
         Console.WriteLine("Seeding database...");
 
-        GetConnection();
-
-        if (Connection is null)
+        using (var conn = GetIndividualConnection())
         {
-            throw new Exception("Connection is null");
-        }
+            if (conn is null)
+            {
+                throw new Exception("Connection is null");
+            }
 
-        try
-        {
-            await Connection.OpenAsync();
+            try
+            {
+                await conn.OpenAsync();
 
-            // Create BlogPost table
-            await CreateTableAsync(Commands.CreateBlogPostTable);
-            await InsertDataIfBlogpostTableEmpty();
+                // Create BlogPost table
+                await CreateTableAsync(Commands.CreateBlogPostTable, conn);
+                await InsertDataIfBlogpostTableEmpty(conn);
 
-            // Create Image Table
-            await CreateTableAsync(Commands.CreateImageTable);
-            await InsertDataIfImageTableEmpty();
+                // Create Image Table
+                await CreateTableAsync(Commands.CreateImageTable, conn);
+                await InsertDataIfImageTableEmpty(conn);
 
-            Console.WriteLine("Seeded database successfully");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"An error occured while seeding the database: {ex}");
-            throw;
-        }
-        finally
-        {
-            await Connection.DisposeAsync();
+                Console.WriteLine("Seeded database successfully");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occured while seeding the database: {ex}");
+                await conn.CloseAsync();
+                throw;
+            }
         }
     }
 
-    private async Task CreateTableAsync(string sqlCommand)
+    private async Task CreateTableAsync(string sqlCommand, NpgsqlConnection conn)
     {
-        using var cmd = new NpgsqlCommand(sqlCommand, Connection);
+        using var cmd = new NpgsqlCommand(sqlCommand, conn);
 
         await cmd.ExecuteNonQueryAsync();
     }
 
-    private async Task InsertDataIfBlogpostTableEmpty()
+    private async Task InsertDataIfBlogpostTableEmpty(NpgsqlConnection conn)
     {
 
-        using var cmd = new NpgsqlCommand(Commands.InsertIntoBlogPostsIfEmpty, Connection);
+        using var cmd = new NpgsqlCommand(Commands.InsertIntoBlogPostsIfEmpty, conn);
 
         // Set parameter values
         DateTime now = DateTime.Now;
@@ -64,9 +62,9 @@ public class DatabaseSeeder() : DatabaseAbstract
         await cmd.ExecuteNonQueryAsync();
     }
 
-    private async Task InsertDataIfImageTableEmpty()
+    private async Task InsertDataIfImageTableEmpty(NpgsqlConnection conn)
     {
-        using var cmd = new NpgsqlCommand(Commands.InsertIntoImageTableIfEmpty, Connection);
+        using var cmd = new NpgsqlCommand(Commands.InsertIntoImageTableIfEmpty, conn);
 
         // get image file 
         var currentDirectory = Directory.GetCurrentDirectory();

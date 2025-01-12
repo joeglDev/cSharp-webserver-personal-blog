@@ -25,19 +25,6 @@ public abstract class DatabaseAbstract
         return envVars;
     }
 
-    //- TODO: Do not store connection state globally in class instead get a new one each time. Replace with GetIndvidualConnection
-    public void GetConnection()
-    {
-        Console.WriteLine("Setting the connection string");
-
-        Dictionary<string, string?> envVars = GetEnvVariables();
-
-        string connectionString = $"Host={envVars["HOST"]};database={envVars["DATABASE"]};Username={envVars["USERNAME"]};Password={envVars["PASSWORD"]};";
-
-        var connection = new NpgsqlConnection(connectionString);
-        Connection = connection;
-    }
-
     public NpgsqlConnection GetIndividualConnection()
     {
         Console.WriteLine("Setting the connection string");
