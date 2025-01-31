@@ -2,8 +2,8 @@
 namespace v2.Controllers;
 
 using System.Collections.Generic;
-using v2.Db;
-using v2.Models;
+using Db;
+using Models;
 
 
 public class ImageService
@@ -24,9 +24,13 @@ public class ImageService
         {
             return Results.Ok(image);
         }
+        else if (image is null)
+        {
+            return Results.NotFound();
+        }
         else
         {
-            return Results.BadRequest();
+            return Results.InternalServerError();
         }
     }
 
@@ -60,9 +64,13 @@ public class ImageService
     {
         var deleteSucceeded = await Service.DeleteImage(id);
 
-        if (deleteSucceeded)
+        if (deleteSucceeded is true)
         {
             return Results.NoContent();
+        }
+        else if (deleteSucceeded is null)
+        {
+            return Results.NotFound();
         }
         else
         {

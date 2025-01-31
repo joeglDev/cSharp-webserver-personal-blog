@@ -31,15 +31,19 @@ public class BlogPostService
 
     public static async Task<IResult> DeleteBlogPost(int id)
     {
-        var deleteSucceeded = await Service.DeleteBlogPost(id);
+        var result = await Service.DeleteBlogPost(id);
 
-        if (deleteSucceeded)
+        if (result == 1)
         {
             return Results.NoContent();
         }
+        else if (result == 0)
+        {
+            return Results.NotFound();
+        }
         else
         {
-            return Results.BadRequest();
+            return Results.InternalServerError();
         }
     }
 
@@ -53,7 +57,7 @@ public class BlogPostService
         }
         else
         {
-            return Results.BadRequest();
+            return Results.NotFound();
         }
     }
 };
