@@ -4,7 +4,7 @@ using v2.Models;
 
 namespace v2.Db;
 
-public class ImageDatabaseService() : DatabaseAbstract
+public class ImageDatabaseService : DatabaseAbstract
 {
     private static async Task<byte[]> ReadBytesFromReader(NpgsqlDataReader reader, int ordinal)
     {
@@ -72,7 +72,6 @@ public class ImageDatabaseService() : DatabaseAbstract
         }
     }
 
-    // TODO: add http 404 not found err handling
     public async Task<ImageRow?> GetImageById(int blogpostId)
     {
         using (var conn = GetIndividualConnection())
@@ -84,8 +83,6 @@ public class ImageDatabaseService() : DatabaseAbstract
 
             try
             {
-                List<ImageRow> images = [];
-
                 if (conn.State != ConnectionState.Open)
                 {
                     await conn.OpenAsync();
@@ -97,20 +94,24 @@ public class ImageDatabaseService() : DatabaseAbstract
 
                 using var reader = await cmd.ExecuteReaderAsync();
 
-                while (await reader.ReadAsync())
+                // handle 404
+                if (await reader.ReadAsync() is false)
                 {
-                    images.Add(new ImageRow(
+                    return null;
+                }
+                else
+                {
+                    var image = new ImageRow(
                         reader.GetInt32(ordinal: 0), // Id
                         reader.GetInt32(ordinal: 1), // blogpost_id
                         reader.GetString(ordinal: 2), // name
                         await ReadBytesFromReader(reader, 3)
+                    );
 
-                    ));
+                    return image;
                 }
 
-                await reader.CloseAsync();
-                await conn.CloseAsync();
-                return images[0];
+
             }
             catch (Exception ex)
             {
@@ -161,7 +162,7 @@ public class ImageDatabaseService() : DatabaseAbstract
         }
     }
 
-    public async Task<bool> DeleteImage(int blogpostId)
+    public async Task<bool?> DeleteImage(int blogpostId)
     {
 
         using (var conn = GetIndividualConnection())
@@ -180,15 +181,14 @@ public class ImageDatabaseService() : DatabaseAbstract
 
                 cmd.Parameters.AddWithValue(":blogpost_id", blogpostId);
 
-                int affectedRows = await cmd.ExecuteNonQueryAsync();
+                int result = await cmd.ExecuteNonQueryAsync();
 
                 await conn.CloseAsync();
-                return affectedRows > 0;
 
+                return result > 0 ? true : null;
             }
             catch (Exception ex)
             {
-                // todo: add 404 error handling here
                 // todo: add 400 error handling
                 Console.WriteLine($"An error occured deleting image: {ex}");
                 await conn.CloseAsync();

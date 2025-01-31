@@ -87,3 +87,9 @@ The following properties are supported for an image.
 To get started with this API, clone the repository and run the application using your preferred .NET CLI or IDE. The API will be available at `http://localhost:<port>/api`.
 
 Make sure to install packages like Swagger and Swagger UI to test and explore the API using a web browser. For example, you can use Postman to make requests against the API endpoints.
+
+## TODO
+1. 400 error handling where appropriate
+2. Authorization
+3. Authentication
+4. Image database store name and alt text via post request
