@@ -1,4 +1,5 @@
 using Npgsql;
+using v2.utils;
 
 namespace v2.Db;
 
@@ -27,6 +28,11 @@ public class DatabaseSeeder() : DatabaseAbstract
                 await CreateTableAsync(Commands.CreateImageTable, conn);
                 await InsertDataIfImageTableEmpty(conn);
 
+                // Create User Table
+                await CreateTableAsync(Commands.CreateUsersTable, conn);
+                await InsertDataIfUsersTableEmpty(conn);
+
+
                 Console.WriteLine("Seeded database successfully");
             }
             catch (Exception ex)
@@ -41,6 +47,22 @@ public class DatabaseSeeder() : DatabaseAbstract
     private async Task CreateTableAsync(string sqlCommand, NpgsqlConnection conn)
     {
         using var cmd = new NpgsqlCommand(sqlCommand, conn);
+
+        await cmd.ExecuteNonQueryAsync();
+    }
+
+    private async Task InsertDataIfUsersTableEmpty(NpgsqlConnection conn)
+    {
+
+        using var cmd = new NpgsqlCommand(Commands.InsertIntoUsersIfEmpty, conn);
+
+        // Set parameter values
+        var hasher = new PasswordHasher();
+        var saltedHashedPassword = hasher.RunPasswordHasher("password");
+
+
+        cmd.Parameters.AddWithValue(":username", "test");
+        cmd.Parameters.AddWithValue(":password", saltedHashedPassword);
 
         await cmd.ExecuteNonQueryAsync();
     }
