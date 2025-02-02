@@ -79,6 +79,6 @@ INSERT INTO images (blogpost_id, name, img)
 VALUES (:blogpostId, :name, :img) RETURNING ID";
 
     public string DeleteImage = "DELETE FROM images WHERE blogpost_id = :blogpost_id";
-    
+
     public string SelectPasswordByUsername = "SELECT Password FROM users WHERE Username = :username;";
 }

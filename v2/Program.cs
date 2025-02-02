@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using v2.Controllers;
 using v2.Db;
 using v2.Models;
@@ -18,6 +20,25 @@ builder.Services.AddCors(options =>
             .AllowCredentials());
 });
 
+// User auth
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(180);
+        options.SlidingExpiration = true;
+        options.LoginPath = "/api/login";
+        options.LogoutPath = "/api/logout";
+        options.Events.OnRedirectToLogin = context =>
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return Task.CompletedTask;
+        };
+    });
+
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 app.UseSwagger();
@@ -25,33 +46,47 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 app.UseCors("AllowLocalHost");
 
+// User auth
+app.UseAuthorization();
+
+var cookiePolicyOptions = new CookiePolicyOptions
+{
+    MinimumSameSitePolicy = SameSiteMode.Strict,
+};
+
+app.UseCookiePolicy(cookiePolicyOptions);
+
+// Seed database
 var seeder = new DatabaseSeeder();
 await seeder.SeedDbAsync();
 
-// user authentication
-app.MapPost("/api/login", (UserLoginRequestItem userLoginRequest) => UserService.PostUserLogin(userLoginRequest)).WithTags("User");
+// user authentication: Must get cookie from this endpoint to authorize other endpoints
+app.MapPost("/api/login", [AllowAnonymous]
+(UserLoginRequestItem userLoginRequest, HttpContext context) => UserService.PostUserLogin(userLoginRequest, context)).WithTags("User");
+
+app.MapGet("/api/logout", [AllowAnonymous] (context) => UserService.PostUserLogout(context)).WithTags("User");
 
 // blogposts 
 app.MapGet("/api/ping", () => "pong").WithTags("General");
 
 app.MapGet("/api/author", () => GetAuthorItemService.GetAuthorItem("Joe Gilbert", "joeglDev")).WithTags("General");
 
-app.MapGet("/api/posts", () => BlogPostService.GetAllPosts()).WithTags("Blog Posts");
+app.MapGet("/api/posts", [Authorize] () => BlogPostService.GetAllPosts()).WithTags("Blog Posts");
 
-app.MapPost("/api/post", (BlogPost newPost) => BlogPostService.PostBlogPost(newPost)).WithTags("Blog Posts");
+app.MapPost("/api/post", [Authorize] (BlogPost newPost) => BlogPostService.PostBlogPost(newPost)).WithTags("Blog Posts");
 
-app.MapDelete("/api/post/{id}", (int id) => BlogPostService.DeleteBlogPost(id)).WithTags("Blog Posts");
+app.MapDelete("/api/post/{id}", [Authorize] (int id) => BlogPostService.DeleteBlogPost(id)).WithTags("Blog Posts");
 
-app.MapPatch("/api/post/{id}", (int id, BlogPost updatedBlogPost) => BlogPostService.PatchBlogPost(id, updatedBlogPost)).WithTags("Blog Posts");
+app.MapPatch("/api/post/{id}", [Authorize] (int id, BlogPost updatedBlogPost) => BlogPostService.PatchBlogPost(id, updatedBlogPost)).WithTags("Blog Posts");
 
 // images
-app.MapGet("/api/images", () => ImageService.GetAllImages()).WithTags("Images");
+app.MapGet("/api/images", [Authorize] () => ImageService.GetAllImages()).WithTags("Images");
 
-app.MapGet("/api/image/{id}", (int id) => ImageService.GetImage(id)).WithTags("Images");
+app.MapGet("/api/image/{id}", [Authorize] (int id) => ImageService.GetImage(id)).WithTags("Images");
 
 // Todo: implement antiforgery
-app.MapPost("/api/image/{id}", (int id, IFormFile imageFile) => ImageService.PostImage(id, imageFile)).WithTags("Images").DisableAntiforgery();
+app.MapPost("/api/image/{id}", [Authorize] (int id, IFormFile imageFile) => ImageService.PostImage(id, imageFile)).WithTags("Images").DisableAntiforgery();
 
-app.MapDelete("/api/image/{id}", (int id) => ImageService.DeleteImage(id)).WithTags("Images");
+app.MapDelete("/api/image/{id}", [Authorize] (int id) => ImageService.DeleteImage(id)).WithTags("Images");
 
 app.Run();
