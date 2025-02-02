@@ -28,6 +28,9 @@ app.UseCors("AllowLocalHost");
 var seeder = new DatabaseSeeder();
 await seeder.SeedDbAsync();
 
+// user authentication
+app.MapPost("/api/login", (UserLoginRequestItem userLoginRequest) => UserService.PostUserLogin(userLoginRequest)).WithTags("User");
+
 // blogposts 
 app.MapGet("/api/ping", () => "pong").WithTags("General");
 
