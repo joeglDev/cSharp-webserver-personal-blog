@@ -10,6 +10,12 @@ public class DatabaseCommands
             Likes INTEGER DEFAULT 0
         );";
 
+    public string CreateUsersTable = @"CREATE TABLE IF NOT EXISTS users (
+            Id SERIAL PRIMARY KEY,
+            Username VARCHAR(255),
+            Password VARCHAR(255)
+       );";
+
     public string CreateImageTable = @"CREATE TABLE IF NOT EXISTS images (
     id SERIAL PRIMARY KEY,
     blogpost_id INTEGER NOT NULL,
@@ -49,6 +55,12 @@ public class DatabaseCommands
 SELECT :author, :title, :content, :timestamp, :likes
 WHERE NOT EXISTS (
     SELECT 1 FROM blogposts WHERE Author = :author AND Title = :title
+);";
+
+    public string InsertIntoUsersIfEmpty = @"INSERT INTO users (Username, Password)
+SELECT :username, :password
+WHERE NOT EXISTS (
+    SELECT 1 FROM users WHERE Username = :username
 );";
 
     public string InsertIntoImageTableIfEmpty = @"

@@ -6,9 +6,9 @@ public class UserService
 {
     public static IResult PostUserLogin(UserLoginRequestItem request)
     {
-        // 1. Seeder func should create user table then add username and hash salted password
+        // 1. DONE - Seeder func should create user table then add username and hash salted password
         // 2. Check against username and password in database 
-        // - insert username and hashed and salted password into database
+        // - DONE - Insert username and hashed and salted password into database
         // - hash and salt request password and check against username
         // if match than return token and username
         // if not reject
