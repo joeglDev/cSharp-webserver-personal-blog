@@ -1,6 +1,7 @@
 using System.Data;
 using Npgsql;
 using v2.Models;
+using v2.utils;
 
 namespace v2.Db;
 
@@ -45,6 +46,44 @@ public class UserDatabaseService : DatabaseAbstract
             catch (Exception ex)
             {
                 Console.WriteLine($"An error occured reading user password: {ex}");
+                await conn.CloseAsync();
+                return null;
+            }
+        }
+    }
+
+    public async Task<int?> InsertNewUser(string username, string password)
+    {
+        using (var conn = GetIndividualConnection())
+        {
+            if (conn is null)
+            {
+                throw new Exception("Connection is null");
+            }
+
+            try
+            {
+                if (conn.State != ConnectionState.Open)
+                {
+                    await conn.OpenAsync();
+                }
+
+                var passwordHasher = new PasswordHasher();
+                var hashedPassword = passwordHasher.RunPasswordHasher(password);
+
+                using var cmd = new NpgsqlCommand(Commands.InsertNewUser, conn);
+
+                cmd.Parameters.AddWithValue(":username", username);
+                cmd.Parameters.AddWithValue(":password", hashedPassword);
+
+                int result = await cmd.ExecuteNonQueryAsync();
+
+                await conn.CloseAsync();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occured inserting the new user: {ex}");
                 await conn.CloseAsync();
                 return null;
             }

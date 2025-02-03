@@ -1,4 +1,5 @@
 namespace v2.Db;
+
 public class DatabaseCommands
 {
     public string CreateBlogPostTable = @"CREATE TABLE IF NOT EXISTS blogposts (
@@ -49,7 +50,8 @@ public class DatabaseCommands
 
     public string DeleteBlogPost = @"DELETE FROM blogposts WHERE Id = :Id";
 
-    public string UpdateBlogPost = @"UPDATE blogPosts SET Author=:Author, Title=:Title, Content=:Content, TimeStamp=TimeStamp, Likes=:Likes WHERE Id = :Id RETURNING Id;";
+    public string UpdateBlogPost =
+        @"UPDATE blogPosts SET Author=:Author, Title=:Title, Content=:Content, TimeStamp=TimeStamp, Likes=:Likes WHERE Id = :Id RETURNING Id;";
 
     public string InsertIntoBlogPostsIfEmpty = @"INSERT INTO blogposts (Author, Title, Content, TimeStamp, Likes)
 SELECT :author, :title, :content, :timestamp, :likes
@@ -81,4 +83,8 @@ VALUES (:blogpostId, :name, :img) RETURNING ID";
     public string DeleteImage = "DELETE FROM images WHERE blogpost_id = :blogpost_id";
 
     public string SelectPasswordByUsername = "SELECT Password FROM users WHERE Username = :username;";
+
+    public string InsertNewUser = @"INSERT INTO users (Username, Password)
+    SELECT :username, :password
+        WHERE NOT EXISTS (SELECT 1 FROM users WHERE Username = :username);";
 }
