@@ -14,9 +14,6 @@ public class UserService : ControllerBase
     private static readonly UserDatabaseService Service = new UserDatabaseService();
     public static async Task<IResult> PostUserLogin(UserLoginRequestItem request, HttpContext context)
     {
-
-        // TODO insert new userendpoint
-
         var dbHashedPassword = await Service.GetPasswordByUsername(request.Username);
 
         // handle 404
@@ -58,5 +55,21 @@ public class UserService : ControllerBase
     public static async Task PostUserLogout(HttpContext context)
     {
         await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+    }
+
+    public static async Task<IResult> PostUserSignup(UserLoginRequestItem request)
+    {
+        var result = await Service.InsertNewUser(request.Username, request.Password);
+
+        if (result > 0)
+        {
+            return Results.Ok();
+        }
+        else if (result == 0)
+        {
+            return Results.BadRequest("This username already exists.");
+        }
+
+        return Results.InternalServerError("An error occured inserting the new user");
     }
 }

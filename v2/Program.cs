@@ -64,7 +64,10 @@ await seeder.SeedDbAsync();
 app.MapPost("/api/login", [AllowAnonymous]
 (UserLoginRequestItem userLoginRequest, HttpContext context) => UserService.PostUserLogin(userLoginRequest, context)).WithTags("User");
 
-app.MapGet("/api/logout", [AllowAnonymous] (context) => UserService.PostUserLogout(context)).WithTags("User");
+app.MapPost("/api/signup", [AllowAnonymous]
+(UserLoginRequestItem userLoginRequest) => UserService.PostUserSignup(userLoginRequest)).WithTags("User");
+
+app.MapGet("/api/logout", [Authorize] (HttpContext context) => UserService.PostUserLogout(context)).WithTags("User");
 
 // blogposts 
 app.MapGet("/api/ping", () => "pong").WithTags("General");
