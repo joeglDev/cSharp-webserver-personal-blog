@@ -18,14 +18,14 @@ public class BlogPostService
 
     public static async Task<IResult> PostBlogPost(BlogPost newPost)
     {
-        var insertSucceeded = await Service.InsertBlogPost(newPost);
-        if (insertSucceeded)
+        var response = await Service.InsertBlogPost(newPost);
+        if (response is null)
         {
-            return Results.Created("/api/posts/" + newPost.Id, newPost);
+            return Results.BadRequest();
         }
         else
         {
-            return Results.BadRequest();
+            return Results.Created("/api/posts/" + newPost.Id, response);
         }
     }
 

@@ -55,7 +55,7 @@ public class BlogPostDatabaseService : DatabaseAbstract
         }
     }
 
-    public async Task<bool> InsertBlogPost(BlogPost newPost)
+    public async Task<BlogPost?> InsertBlogPost(BlogPost newPost)
     {
 
         using (var conn = GetIndividualConnection())
@@ -70,7 +70,7 @@ public class BlogPostDatabaseService : DatabaseAbstract
 
                 await conn.OpenAsync();
 
-                using var cmd = new NpgsqlCommand(Commands.InsertBlogPost, conn);
+                await using var cmd = new NpgsqlCommand(Commands.InsertBlogPost, conn);
 
                 cmd.Parameters.AddWithValue(":Author", newPost.Author);
                 cmd.Parameters.AddWithValue(":Title", newPost.Title);
@@ -80,17 +80,23 @@ public class BlogPostDatabaseService : DatabaseAbstract
 
                 object? result = cmd.ExecuteScalar();
                 result = (result == DBNull.Value) ? null : result;
+
                 int id = Convert.ToInt32(result);
 
-                return id > 0;
+                if (id > 0)
+                {
+                    var newlyInsertedBlogPost = new BlogPost(id, newPost.Author, newPost.Title, newPost.Content, newPost.TimeStamp, newPost.Likes);
+                    return newlyInsertedBlogPost;
+                }
+
+                return null;
 
             }
             catch (Exception ex)
             {
-                // todo: add 400 error handling here
                 Console.WriteLine($"An error occured creating a blog post: {ex}");
                 await conn.CloseAsync();
-                return false;
+                return null;
             }
         }
     }
