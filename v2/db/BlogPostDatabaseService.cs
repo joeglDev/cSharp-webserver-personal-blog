@@ -11,19 +11,16 @@ public class BlogPostDatabaseService : DatabaseAbstract
 
         using (var conn = GetIndividualConnection())
         {
-            if (conn is null)
-            {
-                throw new Exception("Connection is null");
-            }
+            if (conn is null) throw new Exception("Connection is null");
 
             try
             {
-
                 await conn.OpenAsync();
 
                 using var cmd = new NpgsqlBatch(conn)
                 {
-                    BatchCommands = {
+                    BatchCommands =
+                    {
                         new NpgsqlBatchCommand(Commands.SelectAllBlogPosts)
                     }
                 };
@@ -31,20 +28,17 @@ public class BlogPostDatabaseService : DatabaseAbstract
                 using var reader = await cmd.ExecuteReaderAsync();
 
                 while (await reader.ReadAsync())
-                {
                     posts.Add(new BlogPost(
-                        reader.GetInt32(ordinal: 0), // Id
-                        reader.GetString(ordinal: 1), // Author
-                        reader.GetString(ordinal: 2), // Title
-                        reader.GetString(ordinal: 3), // Content
-                        reader.GetDateTime(ordinal: 4), // TimeStamp
-                        reader.GetInt32(ordinal: 5)   // Likes
+                        reader.GetInt32(0), // Id
+                        reader.GetString(1), // Author
+                        reader.GetString(2), // Title
+                        reader.GetString(3), // Content
+                        reader.GetDateTime(4), // TimeStamp
+                        reader.GetInt32(5) // Likes
                     ));
-                }
 
                 await reader.CloseAsync();
                 return posts;
-
             }
             catch (Exception ex)
             {
@@ -57,17 +51,12 @@ public class BlogPostDatabaseService : DatabaseAbstract
 
     public async Task<BlogPost?> InsertBlogPost(BlogPost newPost)
     {
-
         using (var conn = GetIndividualConnection())
         {
-            if (conn is null)
-            {
-                throw new Exception("Connection is null");
-            }
+            if (conn is null) throw new Exception("Connection is null");
 
             try
             {
-
                 await conn.OpenAsync();
 
                 await using var cmd = new NpgsqlCommand(Commands.InsertBlogPost, conn);
@@ -78,19 +67,19 @@ public class BlogPostDatabaseService : DatabaseAbstract
                 cmd.Parameters.AddWithValue(":TimeStamp", newPost.TimeStamp);
                 cmd.Parameters.AddWithValue(":Likes", newPost.Likes);
 
-                object? result = cmd.ExecuteScalar();
-                result = (result == DBNull.Value) ? null : result;
+                var result = cmd.ExecuteScalar();
+                result = result == DBNull.Value ? null : result;
 
-                int id = Convert.ToInt32(result);
+                var id = Convert.ToInt32(result);
 
                 if (id > 0)
                 {
-                    var newlyInsertedBlogPost = new BlogPost(id, newPost.Author, newPost.Title, newPost.Content, newPost.TimeStamp, newPost.Likes);
+                    var newlyInsertedBlogPost = new BlogPost(id, newPost.Author, newPost.Title, newPost.Content,
+                        newPost.TimeStamp, newPost.Likes);
                     return newlyInsertedBlogPost;
                 }
 
                 return null;
-
             }
             catch (Exception ex)
             {
@@ -103,27 +92,21 @@ public class BlogPostDatabaseService : DatabaseAbstract
 
     public async Task<int> DeleteBlogPost(int id)
     {
-
         using (var conn = GetIndividualConnection())
         {
-            if (conn is null)
-            {
-                throw new Exception("Connection is null");
-            }
+            if (conn is null) throw new Exception("Connection is null");
 
             try
             {
-
                 await conn.OpenAsync();
 
                 using var cmd = new NpgsqlCommand(Commands.DeleteBlogPost, conn);
 
                 cmd.Parameters.AddWithValue(":Id", id);
 
-                int result = await cmd.ExecuteNonQueryAsync();
+                var result = await cmd.ExecuteNonQueryAsync();
 
                 return result;
-
             }
             catch (Exception ex)
             {
@@ -139,14 +122,10 @@ public class BlogPostDatabaseService : DatabaseAbstract
     {
         using (var conn = GetIndividualConnection())
         {
-            if (conn is null)
-            {
-                throw new Exception("Connection is null");
-            }
+            if (conn is null) throw new Exception("Connection is null");
 
             try
             {
-
                 await conn.OpenAsync();
 
                 using var cmd = new NpgsqlCommand(Commands.UpdateBlogPost, conn);

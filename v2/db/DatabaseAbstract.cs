@@ -5,8 +5,8 @@ namespace v2.Db;
 
 public abstract class DatabaseAbstract
 {
+    public DatabaseCommands Commands = new();
     public NpgsqlConnection? Connection;
-    public DatabaseCommands Commands = new DatabaseCommands();
 
     private static Dictionary<string, string?> GetEnvVariables()
     {
@@ -29,12 +29,12 @@ public abstract class DatabaseAbstract
     {
         Console.WriteLine("Setting the connection string");
 
-        Dictionary<string, string?> envVars = GetEnvVariables();
+        var envVars = GetEnvVariables();
 
-        string connectionString = $"Host={envVars["HOST"]};database={envVars["DATABASE"]};Username={envVars["USERNAME"]};Password={envVars["PASSWORD"]};";
+        var connectionString =
+            $"Host={envVars["HOST"]};database={envVars["DATABASE"]};Username={envVars["USERNAME"]};Password={envVars["PASSWORD"]};";
 
         var connection = new NpgsqlConnection(connectionString);
         return connection;
     }
-
 }
