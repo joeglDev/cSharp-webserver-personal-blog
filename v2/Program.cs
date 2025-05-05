@@ -87,6 +87,7 @@ app.MapPatch("/api/post/{id}",
     .WithTags("Blog Posts");
 
 // images
+// TODO: remove below and rename server images routs to /api/images
 app.MapGet("/api/images", [Authorize]() => ImageService.GetAllImages()).WithTags("Images");
 
 app.MapGet("/api/image/{id}", [Authorize](int id) => ImageService.GetImage(id)).WithTags("Images");
@@ -96,5 +97,17 @@ app.MapPost("/api/image/{id}", [Authorize](int id, IFormFile imageFile) => Image
     .WithTags("Images").DisableAntiforgery();
 
 app.MapDelete("/api/image/{id}", [Authorize](int id) => ImageService.DeleteImage(id)).WithTags("Images");
+
+// server storage images
+app.MapGet("/api/server_storage/image", [Authorize](int id) => ServerStorageImageService.GetImageFile(id))
+    .WithTags("Server storage images");
+
+// Todo: implement antiforgery
+app.MapPost("/api/server_storage/image/{id}",
+        [Authorize](int id, string name, string alt, IFormFile imageFile) =>
+            ServerStorageImageService.PostImage(id, name, alt, imageFile))
+    .WithTags("Server storage images").DisableAntiforgery();
+
+// TODO: delete image
 
 app.Run();

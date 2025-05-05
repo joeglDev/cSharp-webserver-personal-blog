@@ -22,8 +22,13 @@ public class DatabaseSeeder : DatabaseAbstract
                 await InsertDataIfBlogpostTableEmpty(conn);
 
                 // Create Image Table
+                // TODO: remove this step once server storage image table is working
                 await CreateTableAsync(Commands.CreateImageTable, conn);
                 await InsertDataIfImageTableEmpty(conn);
+
+                // create Server storage image table
+                await CreateTableAsync(Commands.CreateServerStorageImageTable, conn);
+                await InsertDataIfServerStorageImageTableEmpty(conn);
 
                 // Create User Table
                 await CreateTableAsync(Commands.CreateUsersTable, conn);
@@ -80,6 +85,7 @@ public class DatabaseSeeder : DatabaseAbstract
         await cmd.ExecuteNonQueryAsync();
     }
 
+    [Obsolete("use InsertIntoServerStorageImageTableIfEmpty instead")]
     private async Task InsertDataIfImageTableEmpty(NpgsqlConnection conn)
     {
         using var cmd = new NpgsqlCommand(Commands.InsertIntoImageTableIfEmpty, conn);
@@ -94,6 +100,19 @@ public class DatabaseSeeder : DatabaseAbstract
         cmd.Parameters.AddWithValue(":img",
             byteArray); // SELECT encode(img::bytea, 'base64') AS image_content FROM images WHERE id = 1;
 
+
+        await cmd.ExecuteNonQueryAsync();
+    }
+
+    private async Task InsertDataIfServerStorageImageTableEmpty(NpgsqlConnection conn)
+    {
+        using var cmd = new NpgsqlCommand(Commands.InsertIntoServerStorageImageTableIfEmpty, conn);
+
+        cmd.Parameters.AddWithValue(":blogpostId", 1);
+        cmd.Parameters.AddWithValue(":name", "bennet_test_image");
+        cmd.Parameters.AddWithValue(":alt", "a test image of my black and white tuxedo cat having a nap.");
+        cmd.Parameters.AddWithValue(":path",
+            "image_1"); // path within public directory to make it easy to change if moved
 
         await cmd.ExecuteNonQueryAsync();
     }
