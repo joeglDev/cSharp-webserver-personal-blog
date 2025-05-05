@@ -100,6 +100,10 @@ WHERE NOT EXISTS (
     SELECT :username, :password
         WHERE NOT EXISTS (SELECT 1 FROM users WHERE Username = :username);";
 
+    public string InsertServerStorageImage = @"
+INSERT INTO server_storage_images (blogpost_id, name, alt, path)
+VALUES (:blogpostId, :name, :alt, :path) RETURNING ID";
+
     public string SelectAllBlogPosts = "SELECT * FROM blogposts;";
 
     public string SelectAllImages = "SELECT * FROM images;";
@@ -110,10 +114,6 @@ WHERE NOT EXISTS (
 
     // server storage images
     public string SelectServerStorageImage = "SELECT * FROM server_storage_images WHERE blogpost_id = :blogpost_id;";
-    
-    public string InsertServerStorageImage = @"
-INSERT INTO server_storage_images (blogpost_id, name, alt, path)
-VALUES (:blogpostId, :name, :alt, :path) RETURNING ID";
 
     public string UpdateBlogPost =
         @"UPDATE blogPosts SET Author=:Author, Title=:Title, Content=:Content, TimeStamp=TimeStamp, Likes=:Likes WHERE Id = :Id RETURNING Id;";

@@ -9,7 +9,7 @@ public class PostServerStorageImageRequest
         Alt = alt;
         Path = path;
     }
-    
+
     public int BlogpostId { get; set; }
     public string Name { get; set; }
     public string Alt { get; set; }

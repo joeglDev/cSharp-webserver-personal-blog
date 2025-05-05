@@ -103,7 +103,9 @@ app.MapGet("/api/server_storage/image", [Authorize](int id) => ServerStorageImag
     .WithTags("Server storage images");
 
 // Todo: implement antiforgery
-app.MapPost("/api/server_storage/image/{id}", [Authorize](int id, string name, string alt, IFormFile imageFile) => ServerStorageImageService.PostImage(id, name, alt, imageFile))
+app.MapPost("/api/server_storage/image/{id}",
+        [Authorize](int id, string name, string alt, IFormFile imageFile) =>
+            ServerStorageImageService.PostImage(id, name, alt, imageFile))
     .WithTags("Server storage images").DisableAntiforgery();
 
 // TODO: delete image

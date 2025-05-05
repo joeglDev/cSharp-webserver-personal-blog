@@ -43,7 +43,7 @@ public class ServerStorageImageDatabaseService : DatabaseAbstract
             }
         }
     }
-    
+
     public async Task<bool> InsertImage(PostServerStorageImageRequest req)
     {
         using (var conn = GetIndividualConnection())
