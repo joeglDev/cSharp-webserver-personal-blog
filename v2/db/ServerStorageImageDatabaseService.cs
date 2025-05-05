@@ -43,4 +43,39 @@ public class ServerStorageImageDatabaseService : DatabaseAbstract
             }
         }
     }
+    
+    public async Task<bool> InsertImage(PostServerStorageImageRequest req)
+    {
+        using (var conn = GetIndividualConnection())
+        {
+            if (conn is null) throw new Exception("Connection is null");
+
+            try
+            {
+                await conn.OpenAsync();
+
+                using var cmd = new NpgsqlCommand(Commands.InsertServerStorageImage, conn);
+
+                cmd.Parameters.AddWithValue(":blogpostId", req.BlogpostId);
+                cmd.Parameters.AddWithValue(":name", req.Name);
+                cmd.Parameters.AddWithValue(":alt", req.Alt);
+                cmd.Parameters.AddWithValue(":path", req.Path);
+
+                var result = cmd.ExecuteScalar();
+                result = result == DBNull.Value ? null : result;
+                var id = Convert.ToInt32(result);
+
+                await conn.CloseAsync();
+
+                return id > 0;
+            }
+            catch (Exception ex)
+            {
+                // todo: add 400 error handling here
+                Console.WriteLine($"An error occured creating the image: {ex}");
+                await conn.CloseAsync();
+                return false;
+            }
+        }
+    }
 }
