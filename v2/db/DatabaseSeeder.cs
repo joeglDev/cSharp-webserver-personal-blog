@@ -112,7 +112,7 @@ public class DatabaseSeeder : DatabaseAbstract
         cmd.Parameters.AddWithValue(":name", "bennet_test_image");
         cmd.Parameters.AddWithValue(":alt", "a test image of my black and white tuxedo cat having a nap.");
         cmd.Parameters.AddWithValue(":path",
-            "/image_1"); // path within public directory to make it easy to change if moved
+            "image_1"); // path within public directory to make it easy to change if moved
 
         await cmd.ExecuteNonQueryAsync();
     }

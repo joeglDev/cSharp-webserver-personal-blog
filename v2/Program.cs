@@ -87,6 +87,7 @@ app.MapPatch("/api/post/{id}",
     .WithTags("Blog Posts");
 
 // images
+// TODO: remove below and rename server images routs to /api/images
 app.MapGet("/api/images", [Authorize]() => ImageService.GetAllImages()).WithTags("Images");
 
 app.MapGet("/api/image/{id}", [Authorize](int id) => ImageService.GetImage(id)).WithTags("Images");
@@ -96,5 +97,9 @@ app.MapPost("/api/image/{id}", [Authorize](int id, IFormFile imageFile) => Image
     .WithTags("Images").DisableAntiforgery();
 
 app.MapDelete("/api/image/{id}", [Authorize](int id) => ImageService.DeleteImage(id)).WithTags("Images");
+
+// server storage images
+app.MapGet("/api/stream_image", [Authorize](int id) => ServerStorageImageService.GetImageFile(id))
+    .WithTags("Server storage images");
 
 app.Run();

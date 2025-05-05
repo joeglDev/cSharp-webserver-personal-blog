@@ -108,6 +108,9 @@ WHERE NOT EXISTS (
 
     public string SelectPasswordByUsername = "SELECT Password FROM users WHERE Username = :username;";
 
+    // server storage images
+    public string SelectServerStorageImage = "SELECT * FROM server_storage_images WHERE blogpost_id = :blogpost_id;";
+
     public string UpdateBlogPost =
         @"UPDATE blogPosts SET Author=:Author, Title=:Title, Content=:Content, TimeStamp=TimeStamp, Likes=:Likes WHERE Id = :Id RETURNING Id;";
 }

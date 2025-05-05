@@ -3,6 +3,7 @@ using v2.Models;
 
 namespace v2.Controllers;
 
+[Obsolete("Use ServerStorageImageService instead")]
 public class ImageService
 {
     private static readonly ImageDatabaseService Service = new();
