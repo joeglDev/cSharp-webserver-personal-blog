@@ -9,15 +9,13 @@ public class ImageDatabaseService : DatabaseAbstract
     private static async Task<byte[]> ReadBytesFromReader(NpgsqlDataReader reader, int ordinal)
     {
         const int bufferSize = 4096;
-        byte[] buffer = new byte[bufferSize];
+        var buffer = new byte[bufferSize];
         long bytesRead;
 
         using (var ms = new MemoryStream())
         {
             while ((bytesRead = reader.GetBytes(ordinal, ms.Position, buffer, 0, bufferSize)) > 0)
-            {
                 await ms.WriteAsync(buffer, 0, (int)bytesRead);
-            }
 
             return ms.ToArray();
         }
@@ -30,19 +28,16 @@ public class ImageDatabaseService : DatabaseAbstract
 
         using (var conn = GetIndividualConnection())
         {
-            if (conn is null)
-            {
-                throw new Exception("Connection is null");
-            }
+            if (conn is null) throw new Exception("Connection is null");
 
             try
             {
-
                 await conn.OpenAsync();
 
                 using var cmd = new NpgsqlBatch(conn)
                 {
-                    BatchCommands = {
+                    BatchCommands =
+                    {
                         new NpgsqlBatchCommand(Commands.SelectAllImages)
                     }
                 };
@@ -50,19 +45,15 @@ public class ImageDatabaseService : DatabaseAbstract
                 using var reader = await cmd.ExecuteReaderAsync();
 
                 while (await reader.ReadAsync())
-                {
                     images.Add(new ImageRow(
-                        reader.GetInt32(ordinal: 0), // Id
-                        reader.GetInt32(ordinal: 1), // blogpost_id
-                        reader.GetString(ordinal: 2), // name
+                        reader.GetInt32(0), // Id
+                        reader.GetInt32(1), // blogpost_id
+                        reader.GetString(2), // name
                         await ReadBytesFromReader(reader, 3)
-
                     ));
-                }
 
                 await reader.CloseAsync();
                 return images;
-
             }
             catch (Exception ex)
             {
@@ -76,17 +67,11 @@ public class ImageDatabaseService : DatabaseAbstract
     {
         using (var conn = GetIndividualConnection())
         {
-            if (conn is null)
-            {
-                throw new Exception("Connection is null");
-            }
+            if (conn is null) throw new Exception("Connection is null");
 
             try
             {
-                if (conn.State != ConnectionState.Open)
-                {
-                    await conn.OpenAsync();
-                }
+                if (conn.State != ConnectionState.Open) await conn.OpenAsync();
 
                 using var cmd = new NpgsqlCommand(Commands.SelectImage, conn);
 
@@ -95,23 +80,16 @@ public class ImageDatabaseService : DatabaseAbstract
                 using var reader = await cmd.ExecuteReaderAsync();
 
                 // handle 404
-                if (await reader.ReadAsync() is false)
-                {
-                    return null;
-                }
-                else
-                {
-                    var image = new ImageRow(
-                        reader.GetInt32(ordinal: 0), // Id
-                        reader.GetInt32(ordinal: 1), // blogpost_id
-                        reader.GetString(ordinal: 2), // name
-                        await ReadBytesFromReader(reader, 3)
-                    );
+                if (await reader.ReadAsync() is false) return null;
 
-                    return image;
-                }
+                var image = new ImageRow(
+                    reader.GetInt32(0), // Id
+                    reader.GetInt32(1), // blogpost_id
+                    reader.GetString(2), // name
+                    await ReadBytesFromReader(reader, 3)
+                );
 
-
+                return image;
             }
             catch (Exception ex)
             {
@@ -124,17 +102,12 @@ public class ImageDatabaseService : DatabaseAbstract
 
     public async Task<bool> InsertImage(ImageRow newImage)
     {
-
         using (var conn = GetIndividualConnection())
         {
-            if (conn is null)
-            {
-                throw new Exception("Connection is null");
-            }
+            if (conn is null) throw new Exception("Connection is null");
 
             try
             {
-
                 await conn.OpenAsync();
 
                 using var cmd = new NpgsqlCommand(Commands.InsertImage, conn);
@@ -143,14 +116,13 @@ public class ImageDatabaseService : DatabaseAbstract
                 cmd.Parameters.AddWithValue(":name", newImage.Name);
                 cmd.Parameters.AddWithValue(":img", newImage.Img);
 
-                object? result = cmd.ExecuteScalar();
-                result = (result == DBNull.Value) ? null : result;
-                int id = Convert.ToInt32(result);
+                var result = cmd.ExecuteScalar();
+                result = result == DBNull.Value ? null : result;
+                var id = Convert.ToInt32(result);
 
                 await conn.CloseAsync();
 
                 return id > 0;
-
             }
             catch (Exception ex)
             {
@@ -164,24 +136,19 @@ public class ImageDatabaseService : DatabaseAbstract
 
     public async Task<bool?> DeleteImage(int blogpostId)
     {
-
         using (var conn = GetIndividualConnection())
         {
-            if (conn is null)
-            {
-                throw new Exception("Connection is null");
-            }
+            if (conn is null) throw new Exception("Connection is null");
 
             try
             {
-
                 await conn.OpenAsync();
 
                 using var cmd = new NpgsqlCommand(Commands.DeleteImage, conn);
 
                 cmd.Parameters.AddWithValue(":blogpost_id", blogpostId);
 
-                int result = await cmd.ExecuteNonQueryAsync();
+                var result = await cmd.ExecuteNonQueryAsync();
 
                 await conn.CloseAsync();
 

@@ -1,6 +1,5 @@
 namespace v2.utils;
 
-
 public class PasswordHasher
 {
     public string RunPasswordHasher(string password)

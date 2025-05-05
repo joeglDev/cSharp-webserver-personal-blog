@@ -4,7 +4,6 @@ namespace v2.utils;
 
 public class PasswordHasherTest
 {
-
     [Fact]
     public void RunPasswordHasher_ShouldHashAndVerifyPasswordPass()
     {

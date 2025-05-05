@@ -1,28 +1,20 @@
 using System.Data;
 using Npgsql;
-using v2.Models;
 using v2.utils;
 
 namespace v2.Db;
 
 public class UserDatabaseService : DatabaseAbstract
 {
-
     public async Task<string?> GetPasswordByUsername(string username)
     {
         using (var conn = GetIndividualConnection())
         {
-            if (conn is null)
-            {
-                throw new Exception("Connection is null");
-            }
+            if (conn is null) throw new Exception("Connection is null");
 
             try
             {
-                if (conn.State != ConnectionState.Open)
-                {
-                    await conn.OpenAsync();
-                }
+                if (conn.State != ConnectionState.Open) await conn.OpenAsync();
 
                 using var cmd = new NpgsqlCommand(Commands.SelectPasswordByUsername, conn);
 
@@ -31,17 +23,10 @@ public class UserDatabaseService : DatabaseAbstract
                 using var reader = await cmd.ExecuteReaderAsync();
 
                 // handle 404
-                if (await reader.ReadAsync() is false)
-                {
-                    return null;
-                }
-                else
-                {
-                    var hashedPassword = reader["password"].ToString();
-                    return hashedPassword;
-                }
+                if (await reader.ReadAsync() is false) return null;
 
-
+                var hashedPassword = reader["password"].ToString();
+                return hashedPassword;
             }
             catch (Exception ex)
             {
@@ -56,17 +41,11 @@ public class UserDatabaseService : DatabaseAbstract
     {
         using (var conn = GetIndividualConnection())
         {
-            if (conn is null)
-            {
-                throw new Exception("Connection is null");
-            }
+            if (conn is null) throw new Exception("Connection is null");
 
             try
             {
-                if (conn.State != ConnectionState.Open)
-                {
-                    await conn.OpenAsync();
-                }
+                if (conn.State != ConnectionState.Open) await conn.OpenAsync();
 
                 var passwordHasher = new PasswordHasher();
                 var hashedPassword = passwordHasher.RunPasswordHasher(password);
@@ -76,7 +55,7 @@ public class UserDatabaseService : DatabaseAbstract
                 cmd.Parameters.AddWithValue(":username", username);
                 cmd.Parameters.AddWithValue(":password", hashedPassword);
 
-                int result = await cmd.ExecuteNonQueryAsync();
+                var result = await cmd.ExecuteNonQueryAsync();
 
                 await conn.CloseAsync();
                 return result;

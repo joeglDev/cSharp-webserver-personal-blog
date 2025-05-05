@@ -1,6 +1,6 @@
-namespace v2.Controllers;
-
 using v2.Models;
+
+namespace v2.Controllers;
 
 public class GetAuthorItemService
 {
@@ -9,5 +9,4 @@ public class GetAuthorItemService
         var myAuthorDetails = new AuthorItem { Name = name, GithubUsername = githubUsername };
         return myAuthorDetails;
     }
-};
-
+}

@@ -1,8 +1,5 @@
 namespace v2.utils;
 
-using System;
-using System.IO;
-
 public static class DotEnv
 {
     public static void Load(string filePath)
