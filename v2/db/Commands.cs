@@ -11,6 +11,7 @@ public class DatabaseCommands
             Likes INTEGER DEFAULT 0
         );";
 
+    [Obsolete("user CreateServerStorageImageTable instead")]
     public string CreateImageTable = @"CREATE TABLE IF NOT EXISTS images (
     id SERIAL PRIMARY KEY,
     blogpost_id INTEGER NOT NULL,
@@ -22,6 +23,20 @@ public class DatabaseCommands
         ON DELETE CASCADE
         ON UPDATE CASCADE
 )";
+
+    public string CreateServerStorageImageTable = @"
+        CREATE TABLE IF NOT EXISTS server_storage_images (                                         
+        id SERIAL PRIMARY KEY,
+        blogpost_id INTEGER NOT NULL,
+        name TEXT,
+        alt TEXT,
+        path TEXT,
+        
+        CONSTRAINT fk_blogpost_id FOREIGN KEY (blogpost_id)
+            REFERENCES blogposts(Id)
+             ON DELETE CASCADE
+             ON UPDATE CASCADE
+    )";
 
     public string CreateUsersTable = @"CREATE TABLE IF NOT EXISTS users (
             Id SERIAL PRIMARY KEY,
@@ -60,12 +75,20 @@ WHERE NOT EXISTS (
     SELECT 1 FROM blogposts WHERE Author = :author AND Title = :title
 );";
 
+    [Obsolete("use InsertIntoServerStorageImageTableIfEmpty instead")]
     public string InsertIntoImageTableIfEmpty = @"
 INSERT INTO images (blogpost_id, name, img)
 SELECT :blogpostId, :name, :img
 WHERE NOT EXISTS (
     SELECT 1 FROM images WHERE blogpost_id = :blogpostId
 )";
+
+    public string InsertIntoServerStorageImageTableIfEmpty = @"
+    INSERT INTO server_storage_images (blogpost_id, name, alt, path)
+    SELECT :blogpostId, :name, :alt, :path
+        WHERE NOT EXISTS (
+        SELECT 1 FROM server_storage_images WHERE blogpost_id = :blogpostId
+    )";
 
     public string InsertIntoUsersIfEmpty = @"INSERT INTO users (Username, Password)
 SELECT :username, :password
