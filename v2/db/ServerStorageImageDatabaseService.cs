@@ -78,4 +78,33 @@ public class ServerStorageImageDatabaseService : DatabaseAbstract
             }
         }
     }
+
+    public async Task<bool> DeleteImage(int blogpostId)
+    {
+        using (var conn = GetIndividualConnection())
+        {
+            if (conn is null) throw new Exception("Connection is null");
+
+            try
+            {
+                await conn.OpenAsync();
+
+                using var cmd = new NpgsqlCommand(Commands.ServerStorageDeleteImage, conn);
+
+                cmd.Parameters.AddWithValue(":blogpost_id", blogpostId);
+
+                var result = await cmd.ExecuteNonQueryAsync();
+
+                await conn.CloseAsync();
+
+                return result > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occured deleting image: {ex}");
+                await conn.CloseAsync();
+                return false;
+            }
+        }
+    }
 }

@@ -4,6 +4,7 @@ using v2.Models;
 
 namespace v2.Db;
 
+[Obsolete("Use ServerStorageImageDatabaseService instead")]
 public class ImageDatabaseService : DatabaseAbstract
 {
     private static async Task<byte[]> ReadBytesFromReader(NpgsqlDataReader reader, int ordinal)

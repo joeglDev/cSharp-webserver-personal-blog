@@ -90,6 +90,7 @@ Make sure to install packages like Swagger and Swagger UI to test and explore th
 
 ## TODO
 1. 400 error handling where appropriate
-2. Authorization
-3. Authentication
-4. Image database store name and alt text via post request
+2. Image database store name and alt text via post request
+3. Serilog instead of Console.WriteLine()
+4. Use Imediator Handler pattern for post requests
+
