@@ -18,7 +18,6 @@ public class ServerStorageImageService
         {
             var basePath = Path.Combine(Directory.GetCurrentDirectory(), "public");
             var fullPath = Path.Combine(basePath, imageMetaData.Path);
-            Console.WriteLine(fullPath);
             var imageStream = File.OpenRead(fullPath);
 
             return Results.File(
@@ -56,5 +55,27 @@ public class ServerStorageImageService
         }
 
         return Results.Created("/api/server_storage/image" + blogpostId, newImageRequest);
+    }
+
+    public static async Task<IResult> DeleteImage(int id)
+    {
+        //  delete image metadata
+        var imageMetaData = await Service.DeleteImage(id);
+        if (imageMetaData is false) return Results.NotFound("File metadata not found");
+
+        // if successful delete file
+        try
+        {
+            var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "public") + $"/image_{id}";
+            Console.WriteLine($"Deleting image: {fullPath}");
+            File.Delete(fullPath);
+
+            return Results.NoContent();
+        }
+        catch (FileNotFoundException)
+        {
+            return Results.NotFound("File not found");
+        }
+
     }
 }

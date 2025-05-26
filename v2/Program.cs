@@ -62,52 +62,53 @@ await seeder.SeedDbAsync();
 
 // user authentication: Must get cookie from this endpoint to authorize other endpoints
 app.MapPost("/api/login",
-    [AllowAnonymous](UserLoginRequestItem userLoginRequest, HttpContext context) =>
+    [AllowAnonymous] (UserLoginRequestItem userLoginRequest, HttpContext context) =>
         UserService.PostUserLogin(userLoginRequest, context)).WithTags("User");
 
 app.MapPost("/api/signup",
-        [AllowAnonymous](UserLoginRequestItem userLoginRequest) => UserService.PostUserSignup(userLoginRequest))
+        [AllowAnonymous] (UserLoginRequestItem userLoginRequest) => UserService.PostUserSignup(userLoginRequest))
     .WithTags("User");
 
-app.MapGet("/api/logout", [Authorize](context) => UserService.PostUserLogout(context)).WithTags("User");
+app.MapGet("/api/logout", [Authorize] (context) => UserService.PostUserLogout(context)).WithTags("User");
 
 // blogposts 
 app.MapGet("/api/ping", () => "pong").WithTags("General");
 
 app.MapGet("/api/author", () => GetAuthorItemService.GetAuthorItem("Joe Gilbert", "joeglDev")).WithTags("General");
 
-app.MapGet("/api/posts", [Authorize]() => BlogPostService.GetAllPosts()).WithTags("Blog Posts");
+app.MapGet("/api/posts", [Authorize] () => BlogPostService.GetAllPosts()).WithTags("Blog Posts");
 
-app.MapPost("/api/post", [Authorize](BlogPost newPost) => BlogPostService.PostBlogPost(newPost)).WithTags("Blog Posts");
+app.MapPost("/api/post", [Authorize] (BlogPost newPost) => BlogPostService.PostBlogPost(newPost)).WithTags("Blog Posts");
 
-app.MapDelete("/api/post/{id}", [Authorize](int id) => BlogPostService.DeleteBlogPost(id)).WithTags("Blog Posts");
+app.MapDelete("/api/post/{id}", [Authorize] (int id) => BlogPostService.DeleteBlogPost(id)).WithTags("Blog Posts");
 
 app.MapPatch("/api/post/{id}",
-        [Authorize](int id, BlogPost updatedBlogPost) => BlogPostService.PatchBlogPost(id, updatedBlogPost))
+        [Authorize] (int id, BlogPost updatedBlogPost) => BlogPostService.PatchBlogPost(id, updatedBlogPost))
     .WithTags("Blog Posts");
 
 // images
 // TODO: remove below and rename server images routs to /api/images
-app.MapGet("/api/images", [Authorize]() => ImageService.GetAllImages()).WithTags("Images");
+app.MapGet("/api/images", [Authorize] () => ImageService.GetAllImages()).WithTags("Images");
 
-app.MapGet("/api/image/{id}", [Authorize](int id) => ImageService.GetImage(id)).WithTags("Images");
+app.MapGet("/api/image/{id}", [Authorize] (int id) => ImageService.GetImage(id)).WithTags("Images");
 
 // Todo: implement antiforgery
-app.MapPost("/api/image/{id}", [Authorize](int id, IFormFile imageFile) => ImageService.PostImage(id, imageFile))
+app.MapPost("/api/image/{id}", [Authorize] (int id, IFormFile imageFile) => ImageService.PostImage(id, imageFile))
     .WithTags("Images").DisableAntiforgery();
 
-app.MapDelete("/api/image/{id}", [Authorize](int id) => ImageService.DeleteImage(id)).WithTags("Images");
+app.MapDelete("/api/image/{id}", [Authorize] (int id) => ImageService.DeleteImage(id)).WithTags("Images");
 
 // server storage images
-app.MapGet("/api/server_storage/image", [Authorize](int id) => ServerStorageImageService.GetImageFile(id))
+app.MapGet("/api/server_storage/image", [Authorize] (int id) => ServerStorageImageService.GetImageFile(id))
     .WithTags("Server storage images");
 
 // Todo: implement antiforgery
 app.MapPost("/api/server_storage/image/{id}",
-        [Authorize](int id, string name, string alt, IFormFile imageFile) =>
+        [Authorize] (int id, string name, string alt, IFormFile imageFile) =>
             ServerStorageImageService.PostImage(id, name, alt, imageFile))
     .WithTags("Server storage images").DisableAntiforgery();
 
 // TODO: delete image
+app.MapDelete("/api/server_storage/image/{id}", [Authorize] (int id) => ServerStorageImageService.DeleteImage(id)).WithTags("Server storage images");
 
 app.Run();
