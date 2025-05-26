@@ -16,4 +16,13 @@ public class ServerStorageImage
     public string Name { get; set; }
     public string Alt { get; set; }
     public string Path { get; set; }
+
+    public void Deconstruct(out int blogpostId, out string name, out
+        string alt, out string path)
+    {
+        blogpostId = BlogpostId;
+        name = Name;
+        alt = Alt;
+        path = Path;
+    }
 }

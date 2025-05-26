@@ -39,10 +39,10 @@ public class ServerStorageImageService
         var basePath = Path.Combine(Directory.GetCurrentDirectory(), "public");
         var fileCount = Directory.GetFiles(basePath).Length + 1;
         var path = $"image_{fileCount}";
+
         var newImageRequest = new PostServerStorageImageRequest(blogpostId, name, alt, path);
         var insertImageMetaData = await Service.InsertImage(newImageRequest);
 
-        Console.WriteLine(insertImageMetaData);
         if (insertImageMetaData is false) return Results.NotFound();
 
         // save file to disk
@@ -59,9 +59,13 @@ public class ServerStorageImageService
 
     public static async Task<IResult> DeleteImage(int id)
     {
+        // get image metadata from database for rollback if necessary
+        var imageMetaData = await Service.GetImageFile(id);
+        if (imageMetaData is null) return Results.NotFound();
+
         //  delete image metadata
-        var imageMetaData = await Service.DeleteImage(id);
-        if (imageMetaData is false) return Results.NotFound("File metadata not found");
+        var deleteImage = await Service.DeleteImage(id);
+        if (deleteImage is false) return Results.NotFound();
 
         // if successful delete file
         try
@@ -74,8 +78,23 @@ public class ServerStorageImageService
         }
         catch (FileNotFoundException)
         {
-            return Results.NotFound("File not found");
+            return await RestoreImageMetaData(imageMetaData);
         }
+    }
 
+    /*
+     If image metadata has been deleted successfully but there is a error when deleting the image from file storage;
+     this can result in a conflict between expected number of files in storage and rows in the image metadata table in database.
+     To prevent this from occurring; insert the image metadata back into the metadata table.
+     */
+    private static async Task<IResult> RestoreImageMetaData(ServerStorageImage imageMetaData)
+    {
+        var (blogpostId, name, alt, path) = imageMetaData;
+        var newImageRequest = new PostServerStorageImageRequest(blogpostId, name, alt, path);
+        var insertImageMetaData = await Service.InsertImage(newImageRequest);
+
+        if (insertImageMetaData is false) return Results.Conflict("The file metadata has been deleted but the file still exists. Database mismatch may occur.");
+
+        return Results.NotFound("File not found. Deleted metadata has been restored.");
     }
 }
