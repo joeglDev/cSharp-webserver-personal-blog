@@ -30,7 +30,7 @@ public class DefineEndpoints : IDefineEndpoints
                 [AllowAnonymous] (UserLoginRequestItem userLoginRequest) => UserService.PostUserSignup(userLoginRequest))
             .WithTags("User");
 
-        app.MapGet("/api/logout", [Authorize] (context) => UserService.PostUserLogout(context)).WithTags("User");
+        app.MapGet("/api/logout", [Authorize] (HttpContext context) => UserService.PostUserLogout(context)).WithTags("User");
     }
 
     private void AddBlogPostEndpoints(WebApplication app)
@@ -63,6 +63,8 @@ public class DefineEndpoints : IDefineEndpoints
     private void AddPingEndpoints(WebApplication app)
     {
         app.MapGet("/api/ping", () => "pong").WithTags("General");
+
+        app.MapGet("/api/authorised-ping", [Authorize] () => PingController.AuthorisedPing()).WithTags("General");
 
         app.MapGet("/api/author", () => GetAuthorItemService.GetAuthorItem("Joe Gilbert", "joeglDev")).WithTags("General");
     }
