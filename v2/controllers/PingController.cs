@@ -1,6 +1,6 @@
 namespace v2.Controllers;
 
-public class PingController
+public static class PingController
 {
     public static IResult AuthorisedPing()
     {

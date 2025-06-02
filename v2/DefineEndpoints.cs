@@ -4,12 +4,7 @@ using v2.Models;
 
 namespace v2;
 
-interface IDefineEndpoints
-{
-    public void AddAllEndpoints(WebApplication app);
-}
-
-public class DefineEndpoints : IDefineEndpoints
+public class DefineEndpoints
 {
     public void AddAllEndpoints(WebApplication app)
     {
@@ -19,7 +14,7 @@ public class DefineEndpoints : IDefineEndpoints
         AddImageEndpoints(app);
     }
 
-    private void AddUserEndpoints(WebApplication app)
+    private static void AddUserEndpoints(WebApplication app)
     {
         // user authentication: Must get cookie from this endpoint to authorize other endpoints
         app.MapPost("/api/login",
@@ -33,7 +28,7 @@ public class DefineEndpoints : IDefineEndpoints
         app.MapGet("/api/logout", [Authorize] (HttpContext context) => UserService.PostUserLogout(context)).WithTags("User");
     }
 
-    private void AddBlogPostEndpoints(WebApplication app)
+    private static void AddBlogPostEndpoints(WebApplication app)
     {
         app.MapGet("/api/posts", [Authorize] () => BlogPostService.GetAllPosts()).WithTags("Blog Posts");
 
@@ -46,7 +41,7 @@ public class DefineEndpoints : IDefineEndpoints
             .WithTags("Blog Posts");
     }
 
-    private void AddImageEndpoints(WebApplication app)
+    private static void AddImageEndpoints(WebApplication app)
     {
         app.MapGet("/api/server_storage/image", [Authorize] (int id) => ServerStorageImageService.GetImageFile(id))
             .WithTags("Server storage images");
@@ -60,7 +55,7 @@ public class DefineEndpoints : IDefineEndpoints
         app.MapDelete("/api/server_storage/image/{id}", [Authorize] (int id) => ServerStorageImageService.DeleteImage(id)).WithTags("Server storage images");
     }
 
-    private void AddPingEndpoints(WebApplication app)
+    private static void AddPingEndpoints(WebApplication app)
     {
         app.MapGet("/api/ping", () => "pong").WithTags("General");
 

@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 using v2;
-using v2.Controllers;
 using v2.Db;
 
 var builder = WebApplication.CreateBuilder(args);
