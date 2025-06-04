@@ -7,7 +7,7 @@ public class ServerStorageImageService
 {
     private static readonly ServerStorageImageDatabaseService Service = new();
 
-    // TODO: does not return alt text so will need a endpoint to get this
+    // TODO: multiple images return by imageId not blogpostId
     public static async Task<IResult> GetImageFile(int id)
     {
         var imageMetaData = await Service.GetImageFile(id);
@@ -57,6 +57,7 @@ public class ServerStorageImageService
         return Results.Created("/api/server_storage/image" + blogpostId, newImageRequest);
     }
 
+    // TODO: delete by imageId not blogpostId
     public static async Task<IResult> DeleteImage(int id)
     {
         // get image metadata from database for rollback if necessary
