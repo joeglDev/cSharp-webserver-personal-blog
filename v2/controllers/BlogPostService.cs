@@ -7,11 +7,16 @@ public class BlogPostService
 {
     private static readonly BlogPostDatabaseService Service = new();
 
-    public static async Task<List<BlogPost>> GetAllPosts()
+    public static async Task<IResult> GetAllPosts()
     {
         var allBlogPosts = await Service.GetAllBlogPosts();
 
-        return allBlogPosts;
+        if (allBlogPosts is null)
+        {
+            return Results.InternalServerError("An unhandled error occured please contact the developer.");
+        }
+
+        return Results.Ok(allBlogPosts);
     }
 
     public static async Task<IResult> PostBlogPost(BlogPost newPost)

@@ -6,7 +6,7 @@ namespace v2.Controllers;
 public class ServerStorageImageService
 {
     private static readonly ServerStorageImageDatabaseService Service = new();
-    
+
     // TODO: multiple images return by imageId not blogpostId
     public static async Task<IResult> GetImageFile(int id)
     {

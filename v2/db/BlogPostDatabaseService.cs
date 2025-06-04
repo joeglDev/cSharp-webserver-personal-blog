@@ -5,7 +5,7 @@ namespace v2.Db;
 
 public class BlogPostDatabaseService : DatabaseAbstract
 {
-    public async Task<List<BlogPost>> GetAllBlogPosts()
+    public async Task<List<BlogPost>?> GetAllBlogPosts()
     {
         List<BlogPost> posts = [];
 
@@ -26,17 +26,12 @@ public class BlogPostDatabaseService : DatabaseAbstract
                 };
 
                 using var reader = await cmd.ExecuteReaderAsync();
-                Console.WriteLine("here");
-                
 
                 while (await reader.ReadAsync())
                 {
-                    var name = reader.GetString(8);
-                    var altText = reader.GetString(9);
-    
-                    Console.WriteLine(name);
-                    Console.WriteLine(altText);
-    
+                    string? name = reader.IsDBNull(8) ? null : reader.GetString(8);
+                    string? altText = reader.IsDBNull(9) ? null : reader.GetString(9);
+
                     posts.Add(new BlogPost(
                         reader.GetInt32(0),     // Id
                         reader.GetString(1),    // Author
@@ -44,7 +39,7 @@ public class BlogPostDatabaseService : DatabaseAbstract
                         reader.GetString(3),    // Content
                         reader.GetDateTime(4),  // TimeStamp
                         reader.GetInt32(5),     // Likes
-                        new ImageMetaData[]
+                        name is null || altText is null ? null : new ImageMetaData[]
                         {
                             new ImageMetaData(name, altText)
                         }
@@ -52,14 +47,14 @@ public class BlogPostDatabaseService : DatabaseAbstract
                 }
 
                 await reader.CloseAsync();
-                
+
                 return posts;
             }
             catch (Exception ex)
             {
                 await conn.CloseAsync();
                 Console.WriteLine($"An error occured reading all blog posts: {ex}");
-                return [];
+                return null;
             }
         }
     }

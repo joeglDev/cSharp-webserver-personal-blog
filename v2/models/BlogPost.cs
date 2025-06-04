@@ -20,7 +20,7 @@ public class BlogPost
     public string Content { get; set; }
     public DateTime TimeStamp { get; set; }
     public int Likes { get; set; }
-    public ImageMetaData[]? Images { get; set; } 
+    public ImageMetaData[]? Images { get; set; }
 }
 
 public class ImageMetaData
