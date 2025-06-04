@@ -35,6 +35,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddAntiforgery();
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
@@ -45,6 +46,7 @@ app.UseHttpsRedirection();
 app.UseCors("AllowLocalHost");
 
 // User auth
+app.UseAntiforgery();
 app.UseAuthorization();
 
 var cookiePolicyOptions = new CookiePolicyOptions

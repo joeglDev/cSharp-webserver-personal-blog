@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Mvc;
 using v2.Db;
 using v2.Models;
 
@@ -47,7 +49,6 @@ public class ServerStorageImageService
 
         // save file to disk
         var filePath = Path.Combine(basePath, path);
-        Console.WriteLine(filePath);
 
         await using (Stream fileStream = new FileStream(filePath, FileMode.Create))
         {
@@ -83,7 +84,7 @@ public class ServerStorageImageService
     }
 
     /*
-     If image metadata has been deleted successfully but there is a error when deleting the image from file storage;
+     If image metadata has been deleted successfully but there is an error when deleting the image from file storage;
      this can result in a conflict between expected number of files in storage and rows in the image metadata table in database.
      To prevent this from occurring; insert the image metadata back into the metadata table.
      */

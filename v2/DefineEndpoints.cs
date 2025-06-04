@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authorization;
 using v2.Controllers;
 using v2.Models;
@@ -12,6 +13,7 @@ public class DefineEndpoints
         AddPingEndpoints(app);
         AddBlogPostEndpoints(app);
         AddImageEndpoints(app);
+        AddAntiforgeryEndpoints(app);
     }
 
     private static void AddUserEndpoints(WebApplication app)
@@ -25,7 +27,7 @@ public class DefineEndpoints
                 [AllowAnonymous] (UserLoginRequestItem userLoginRequest) => UserService.PostUserSignup(userLoginRequest))
             .WithTags("User");
 
-        app.MapGet("/api/logout", [Authorize] (HttpContext context) => UserService.PostUserLogout(context)).WithTags("User");
+        app.MapGet("/api/logout", [Authorize] (context) => UserService.PostUserLogout(context)).WithTags("User");
     }
 
     private static void AddBlogPostEndpoints(WebApplication app)
@@ -46,11 +48,10 @@ public class DefineEndpoints
         app.MapGet("/api/server_storage/image", [Authorize] (int id) => ServerStorageImageService.GetImageFile(id))
             .WithTags("Server storage images");
 
-        // Todo: implement antiforgery
         app.MapPost("/api/server_storage/image/{id}",
                 [Authorize] (int id, string name, string alt, IFormFile imageFile) =>
                     ServerStorageImageService.PostImage(id, name, alt, imageFile))
-            .WithTags("Server storage images").DisableAntiforgery();
+            .WithTags("Server storage images");
 
         app.MapDelete("/api/server_storage/image/{id}", [Authorize] (int id) => ServerStorageImageService.DeleteImage(id)).WithTags("Server storage images");
     }
@@ -62,5 +63,10 @@ public class DefineEndpoints
         app.MapGet("/api/authorised-ping", [Authorize] () => PingController.AuthorisedPing()).WithTags("General");
 
         app.MapGet("/api/author", () => GetAuthorItemService.GetAuthorItem("Joe Gilbert", "joeglDev")).WithTags("General");
+    }
+
+    private static void AddAntiforgeryEndpoints(WebApplication app)
+    {
+        app.MapGet("/api/generate-antiforgery", [Authorize] (HttpContext context, IAntiforgery antiforgery) => AntiforgeryController.GetToken(context, antiforgery)).WithTags("Antiforgery");
     }
 }
