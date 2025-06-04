@@ -100,7 +100,7 @@ WHERE NOT EXISTS (
     SELECT :username, :password
         WHERE NOT EXISTS (SELECT 1 FROM users WHERE Username = :username);";
 
-    public string SelectAllBlogPosts = "SELECT * FROM blogposts;";
+    public string SelectAllBlogPosts = "SELECT * FROM blogposts b INNER JOIN server_storage_images i ON b.Id = i.blogpost_id;";
 
     public string SelectAllImages = "SELECT * FROM images;";
 

@@ -26,18 +26,33 @@ public class BlogPostDatabaseService : DatabaseAbstract
                 };
 
                 using var reader = await cmd.ExecuteReaderAsync();
+                Console.WriteLine("here");
+                
 
                 while (await reader.ReadAsync())
+                {
+                    var name = reader.GetString(8);
+                    var altText = reader.GetString(9);
+    
+                    Console.WriteLine(name);
+                    Console.WriteLine(altText);
+    
                     posts.Add(new BlogPost(
-                        reader.GetInt32(0), // Id
-                        reader.GetString(1), // Author
-                        reader.GetString(2), // Title
-                        reader.GetString(3), // Content
-                        reader.GetDateTime(4), // TimeStamp
-                        reader.GetInt32(5) // Likes
+                        reader.GetInt32(0),     // Id
+                        reader.GetString(1),    // Author
+                        reader.GetString(2),    // Title
+                        reader.GetString(3),    // Content
+                        reader.GetDateTime(4),  // TimeStamp
+                        reader.GetInt32(5),     // Likes
+                        new ImageMetaData[]
+                        {
+                            new ImageMetaData(name, altText)
+                        }
                     ));
+                }
 
                 await reader.CloseAsync();
+                
                 return posts;
             }
             catch (Exception ex)
@@ -75,7 +90,7 @@ public class BlogPostDatabaseService : DatabaseAbstract
                 if (id > 0)
                 {
                     var newlyInsertedBlogPost = new BlogPost(id, newPost.Author, newPost.Title, newPost.Content,
-                        newPost.TimeStamp, newPost.Likes);
+                        newPost.TimeStamp, newPost.Likes, null);
                     return newlyInsertedBlogPost;
                 }
 
