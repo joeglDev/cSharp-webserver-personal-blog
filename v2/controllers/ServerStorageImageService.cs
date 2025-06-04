@@ -35,27 +35,40 @@ public class ServerStorageImageService
         }
     }
 
-    public static async Task<IResult> PostImage(int blogpostId, string name, string alt, IFormFile imageFile)
+    // TODO: try this request with correct antiforgery token on the form
+    // "An authorization error occured: The required antiforgery request token was not provided in either form field \"__RequestVerificationToken\" or header value \"RequestVerificationToken\"."
+    // if this works try again with DisableAntiforgery() removed from endpoint definitions
+    public static async Task<IResult> PostImage(HttpContext context, IAntiforgery antiforgery, int blogpostId, string name, string alt, IFormFile imageFile)
     {
-        // insert into server_storage_images table
-        var basePath = Path.Combine(Directory.GetCurrentDirectory(), "public");
-        var fileCount = Directory.GetFiles(basePath).Length + 1;
-        var path = $"image_{fileCount}";
-
-        var newImageRequest = new PostServerStorageImageRequest(blogpostId, name, alt, path);
-        var insertImageMetaData = await Service.InsertImage(newImageRequest);
-
-        if (insertImageMetaData is false) return Results.NotFound();
-
-        // save file to disk
-        var filePath = Path.Combine(basePath, path);
-
-        await using (Stream fileStream = new FileStream(filePath, FileMode.Create))
+        try
         {
-            await imageFile.CopyToAsync(fileStream);
-        }
+            // Validate antiforgery token
+            await antiforgery.ValidateRequestAsync(context);
+            
+            // insert into server_storage_images table
+            var basePath = Path.Combine(Directory.GetCurrentDirectory(), "public");
+            var fileCount = Directory.GetFiles(basePath).Length + 1;
+            var path = $"image_{fileCount}";
 
-        return Results.Created("/api/server_storage/image" + blogpostId, newImageRequest);
+            var newImageRequest = new PostServerStorageImageRequest(blogpostId, name, alt, path);
+            var insertImageMetaData = await Service.InsertImage(newImageRequest);
+
+            if (insertImageMetaData is false) return Results.NotFound();
+
+            // save file to disk
+            var filePath = Path.Combine(basePath, path);
+
+            await using (Stream fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await imageFile.CopyToAsync(fileStream);
+            }
+
+            return Results.Created("/api/server_storage/image" + blogpostId, newImageRequest);
+        }
+        catch (AntiforgeryValidationException ex)
+        {
+            return Results.BadRequest($"An authorization error occured: {ex.Message}");
+        }
     }
 
     public static async Task<IResult> DeleteImage(int id)

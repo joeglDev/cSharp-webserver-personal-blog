@@ -49,8 +49,8 @@ public class DefineEndpoints
             .WithTags("Server storage images");
 
         app.MapPost("/api/server_storage/image/{id}",
-                [Authorize] (int id, string name, string alt, IFormFile imageFile) =>
-                    ServerStorageImageService.PostImage(id, name, alt, imageFile))
+                [Authorize] (HttpContext context, IAntiforgery antiforgery, int id, string name, string alt, IFormFile imageFile) =>
+                    ServerStorageImageService.PostImage(context, antiforgery, id, name, alt, imageFile)).DisableAntiforgery()
             .WithTags("Server storage images");
 
         app.MapDelete("/api/server_storage/image/{id}", [Authorize] (int id) => ServerStorageImageService.DeleteImage(id)).WithTags("Server storage images");
