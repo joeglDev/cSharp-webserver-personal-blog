@@ -43,7 +43,7 @@ public class DefineEndpoints
 
     private static void AddImageEndpoints(WebApplication app)
     {
-        app.MapGet("/api/server_storage/image", [Authorize] (int id) => ServerStorageImageService.GetImageFile(id))
+        app.MapGet("/api/server_storage/image/{id}", [Authorize] (int id) => ServerStorageImageService.GetImageFile(id))
             .WithTags("Server storage images");
 
         // Todo: implement antiforgery
