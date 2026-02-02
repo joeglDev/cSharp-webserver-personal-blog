@@ -4,6 +4,13 @@ using v2.Models;
 
 namespace v2;
 
+/*
+ * Todo:
+ * 1. When env variable !== development -> add only GET post and GET image endpoints, do not add post, patch or delete endpoints
+ * 2. Do not require auth for get post or get image
+ * 3. Consider adding a GET specific blog post by id endpoint
+ */
+
 public class DefineEndpoints
 {
     public void AddAllEndpoints(WebApplication app)
