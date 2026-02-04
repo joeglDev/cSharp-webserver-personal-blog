@@ -59,6 +59,62 @@ public class BlogPostDatabaseService : DatabaseAbstract
         }
     }
 
+    public async Task<BlogPost?> GetBlogPost(int id)
+    {
+        using (var conn = GetIndividualConnection())
+        {
+            if (conn is null) throw new Exception("Connection is null");
+
+            BlogPost? post = null;
+
+            try
+            {
+                await conn.OpenAsync();
+
+                await using var cmd = new NpgsqlCommand($"""
+                                                         SELECT * FROM blogposts b
+                                                         LEFT JOIN server_storage_images i
+                                                         ON b.id = i.blogpost_id  -- Ensure that the column name in server_storage_images matches 'blogpost_id'
+                                                         WHERE b.id = {id};
+                                                         """);
+                cmd.Connection = conn;
+
+                await using var reader = await cmd.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    string? name = reader.IsDBNull(8) ? null : reader.GetString(8);
+                    string? altText = reader.IsDBNull(9) ? null : reader.GetString(9);
+
+                    post = new BlogPost(
+                        reader.GetInt32(0), // Id
+                        reader.GetString(1), // Author
+                        reader.GetString(2), // Title
+                        reader.GetString(3), // Content
+                        reader.GetDateTime(4), // TimeStamp
+                        reader.GetInt32(5), // Likes
+                        name is null || altText is null
+                            ? null
+                            : new ImageMetaData[]
+                            {
+                                    new ImageMetaData(name, altText)
+                            }
+                    );
+                }
+
+                await reader.CloseAsync();
+
+                return post;
+            }
+            catch (Exception ex)
+            {
+                await conn.CloseAsync();
+                Console.WriteLine($"An error occured reading all blog posts: {ex}");
+                return null;
+            }
+        }
+    }
+
     public async Task<BlogPost?> InsertBlogPost(BlogPost newPost)
     {
         using (var conn = GetIndividualConnection())

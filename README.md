@@ -3,13 +3,16 @@ A web server running C# / dotNET to handle API requests for a personal blogging 
 
 ## Run locally and get Documentation
 
-1. Within ./v2 directory create a env file using 'touch .env' and add the following values for a psql database.
+1. Within ./v2 directory create a env file using 'touch .env' and add the following environment variables.
 - HOST=
 - DATABASE=
 - USERNAME=
 - PASSWORD=
+- ENVIRONMENT=
 
-2. When running in dotNET press `CTRL + F5` and navigate to `https://localhost:5000/swagger/index.html`.
+If `ENVIRONMENT=development` is set as a env variable then the user will have access to additional endpoints. These have been disabled in production for now as to safeguard against hostile actions.
+
+2. When running in dotNET press `CTRL + F5` and navigate to `http://localhost:5000/swagger/index.html`.
 
 Always use V2 code as V1 is deprecated.
 
