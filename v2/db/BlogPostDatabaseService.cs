@@ -71,18 +71,13 @@ public class BlogPostDatabaseService : DatabaseAbstract
             {
                 await conn.OpenAsync();
 
-                await using var cmd = new NpgsqlBatch(conn)
-                {
-                    BatchCommands =
-                        {
-                            new NpgsqlBatchCommand($"""
-                                                     SELECT * FROM blogposts b
-                                                     LEFT JOIN server_storage_images i
-                                                     ON b.id = i.blogpost_id  -- Ensure that the column name in server_storage_images matches 'blogpost_id'
-                                                     WHERE b.id = {id};
-                                                     """)
-                        }
-                };
+                await using var cmd = new NpgsqlCommand($"""
+                                                         SELECT * FROM blogposts b
+                                                         LEFT JOIN server_storage_images i
+                                                         ON b.id = i.blogpost_id  -- Ensure that the column name in server_storage_images matches 'blogpost_id'
+                                                         WHERE b.id = {id};
+                                                         """);
+                cmd.Connection = conn;
 
                 await using var reader = await cmd.ExecuteReaderAsync();
 
