@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using v2.Db;
 using v2.Models;
 
@@ -17,6 +18,18 @@ public class BlogPostService
         }
 
         return Results.Ok(allBlogPosts);
+    }
+
+    public static async Task<IResult> GetBlogPost(int id)
+    {
+        var blogPost = await Service.GetBlogPost(id);
+
+        if (blogPost is null)
+        {
+            return Results.NotFound($"No blog post found with id: {id}");
+        }
+
+        return Results.Ok(blogPost);
     }
 
     public static async Task<IResult> PostBlogPost(BlogPost newPost)

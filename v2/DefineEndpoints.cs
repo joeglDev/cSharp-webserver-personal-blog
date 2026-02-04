@@ -54,7 +54,9 @@ public class DefineEndpoints
                 .WithTags("Blog Posts");
         }
 
-        app.MapGet("/api/posts", [AllowAnonymous] () => BlogPostService.GetAllPosts()).WithTags("Blog Posts");
+        app.MapGet("/api/posts", [AllowAnonymous] () => BlogPostService.GetAllPosts()).WithTags("Blog Posts").Produces<BlogPost[]>();
+
+        app.MapGet("/api/posts/{id}", [AllowAnonymous] (int id) => BlogPostService.GetBlogPost(id)).WithTags("Blog Posts").Produces<BlogPost>();
     }
 
     private static void AddImageEndpoints(WebApplication app)
