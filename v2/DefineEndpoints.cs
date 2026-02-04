@@ -5,11 +5,6 @@ using v2.utils;
 
 namespace v2;
 
-/*
- * Todo:
- * Consider adding a GET specific blog post by id endpoint
- */
-
 public class DefineEndpoints
 {
     private static readonly bool isDevelopment = GetEnvVariables()["ENVIRONMENT"] is "development";
