@@ -13,6 +13,7 @@ A web server running C# / dotNET to handle API requests for a personal blogging 
 If `ENVIRONMENT=development` is set as a env variable then the user will have access to additional endpoints. These have been disabled in production for now as to safeguard against hostile actions.
 
 2. Run by executing the cli command `dotnet run --project v2/v2.csproj` from the project root.
+3. APi documentation available at `http://localhost:5000/swagger/index.html`.
 
 ## Table of Contents
 1. [Introduction](#introduction)
