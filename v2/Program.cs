@@ -1,6 +1,20 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using v2;
 using v2.Db;
+using v2.utils;
+
+// get environment variables
+var root = Directory.GetCurrentDirectory();
+var dotenv = Path.Combine(root, ".env");
+DotEnv.Load(dotenv);
+
+var envVars = new Dictionary<string, string?>
+{
+    ["ENVIRONMENT"] = Environment.GetEnvironmentVariable("ENVIRONMENT"),
+};
+
+string[] allowedMethods = envVars["ENVIRONMENT"] is "development" ? ["GET"] : ["GET", "POST", "PATCH", "DELETE"];
+string[] allowedOrigins = envVars["ENVIRONMENT"] is "development" ? ["http://localhost:3000"] : ["*"]; // TODO: narrow this to website only in production when working
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,8 +26,8 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowLocalHost",
         policy => policy
-            .WithOrigins("http://localhost:3000")
-            .WithMethods("GET", "POST", "PATCH", "DELETE")
+            .WithOrigins(allowedOrigins)
+            .WithMethods(allowedMethods)
             .AllowAnyHeader()
             .AllowCredentials());
 });
@@ -41,8 +55,12 @@ var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
-app.UseHttpsRedirection();
-app.UseCors("AllowLocalHost");
+
+if (envVars["ENVIRONMENT"] is not "development")
+{
+    app.UseHttpsRedirection();
+    app.UseHsts();
+}
 
 // User auth
 app.UseAuthorization();
